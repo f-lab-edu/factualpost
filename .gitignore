@@ -6,3 +6,4 @@ node_modules/
 [._]ss[a-gi-z]
 [._]sw[a-p]
 .env
+tsconfig.build.tsbuildinfo

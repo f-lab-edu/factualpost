@@ -1,8 +1,8 @@
-import { BeforeApplicationShutdown, Injectable, OnModuleDestroy } from "@nestjs/common";
+import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import { DataSource } from "typeorm";
 
 @Injectable()
-export class DatabaseService implements OnModuleDestroy, BeforeApplicationShutdown {
+export class DatabaseService implements OnModuleDestroy {
     constructor(
         private dataSource: DataSource
     ) {}
@@ -12,8 +12,4 @@ export class DatabaseService implements OnModuleDestroy, BeforeApplicationShutdo
         await this.dataSource.destroy();
     }
 
-    async beforeApplicationShutdown() {
-        console.log('Application : Closing database connection');
-        await this.dataSource.destroy();
-    }
 }

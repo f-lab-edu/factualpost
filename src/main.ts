@@ -26,6 +26,8 @@ async function bootstrap() {
     new JwtInterceptor()
   );
 
+  app.enableShutdownHooks();
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 4445;
 
