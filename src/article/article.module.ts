@@ -8,6 +8,7 @@ import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { Article } from "src/entities/Article";
 import { AttachUserInterceptor } from "src/common/interceptor/attach.user.interceptor";
+import { UserModule } from "src/user/user.module";
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { AttachUserInterceptor } from "src/common/interceptor/attach.user.interc
         ]),
         AuthModule,
         ConfigModule,
-        JwtModule
+        JwtModule,
+        UserModule,
     ],
     controllers: [ArticleController],
     providers: [

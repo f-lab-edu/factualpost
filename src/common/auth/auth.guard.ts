@@ -16,9 +16,9 @@ export class JwtAuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const authHeader = await this.extractAuthHeader(request);
         const token = await this.splitAuthHeader(authHeader);
-
         try { 
             request.user = await this.extractUserData(token);
+            console.log(request.user);
             return true;
         } catch(err) {
             return await this.handleExpiredToken(err.message, token, request);
@@ -30,6 +30,7 @@ export class JwtAuthGuard implements CanActivate {
             const userProfile = await this.decodeUserData(token);
             const refreshToken = request.cookies.refreshToken;
             request.newAccessToken = await this.authService.renewAccessToken(userProfile, refreshToken);
+            request.user = await this.extractUserData(request.newAccessToken);
             return true;
         }
         throw new UnauthorizedException(err);
@@ -52,13 +53,17 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     private async extractUserData(token: string): Promise<UserDTO> {
-        const userProfile = this.jwtService.verify(token, {
-                secret: this.configService.get<string>('JWT_SECRET_KEY')
-            }
-        )
-        const {iat, exp, ...user} = userProfile;
-        return user;
+        try {
+            const userProfile = this.jwtService.verify(token, {
+                secret: this.configService.get<string>('JWT_SECRET_KEY'),
+            });
+            const { iat, exp, ...user } = userProfile;
+            return user;
+        } catch (error) {
+            throw error;
+        }
     }
+    
 
     private async decodeUserData(token: string): Promise<UserDTO> {
         const userProfile =  this.jwtService.decode(token);

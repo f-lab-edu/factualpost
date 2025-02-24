@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, DeleteDateColumn } from 'typeorm';
-import { Article } from './Article'
+import { Article } from './Article';
 import { Like } from './Like';
 import { Alarm } from './Alarm';
 

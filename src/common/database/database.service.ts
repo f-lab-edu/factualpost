@@ -8,8 +8,8 @@ export class DatabaseService implements OnModuleDestroy {
     ) {}
 
     async onModuleDestroy() {
-        console.log('Module : Closing Database connection');
+        console.log('Database connection Closed');
         await this.dataSource.destroy();
     }
-
+    
 }

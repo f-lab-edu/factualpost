@@ -22,7 +22,6 @@ async function bootstrap() {
   }));
   
   app.useGlobalInterceptors(
-    new AttachUserInterceptor(), 
     new JwtInterceptor()
   );
 

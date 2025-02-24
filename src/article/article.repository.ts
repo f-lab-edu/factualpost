@@ -1,7 +1,7 @@
-import { HttpException, Injectable } from "@nestjs/common";
-import { CreateAritlce } from "./dtos/article.dto";
+import { HttpException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { RemoveArticle, UpdateArticle } from "./dtos/article.dto";
 import { Article } from "src/entities/Article";
-import { DataSource, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
@@ -9,30 +9,27 @@ export class ArticleRepository {
     
     constructor(
         @InjectRepository(Article) private readonly articleRepository: Repository<Article>,
-        private readonly dataSource: DataSource,
     ) {}
 
-    async write(articleData: CreateAritlce): Promise<number> {
+    async write(articleData: Article): Promise<number> {
         const storedArticle = await this.articleRepository.save(articleData);
         return storedArticle.id;
     }
 
-    async remove(id: number): Promise<void> {
-        const article = await this.dataSource.getRepository(Article).findOne({
-            where: { id }
-        })
-
-        if(article) {
-            await this.articleRepository.softRemove(article);
-        }
+    async update(articleData: UpdateArticle, articleId: number): Promise<void> {
+        const {userId, ...data} = articleData;
+        await this.articleRepository.update(articleId, data);
     }
 
-    async findById(articleId: number): Promise<number> {
+    async remove(articleData: RemoveArticle): Promise<void> {
+        await this.articleRepository.softRemove(articleData);
+    }
+
+    async findById(articleId: number): Promise<Article> {
         const article = await this.articleRepository.findOneBy({ id: articleId });
         if(!article) {
             throw new HttpException('not found article', 404);
         }
-        return article.userId;
+        return article;
     }
-
 }

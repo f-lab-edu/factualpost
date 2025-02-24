@@ -13,10 +13,16 @@ export class ArticleDto extends PickType(Article, ['title', 'contents'] as const
     contents: string;
 }
 
-export class CreateAritlce extends PickType(ArticleDto, ['title', 'contents'] ) {
+export class CreateArticle extends PickType(ArticleDto, ['title', 'contents'] ) {
     @IsOptional()
     @Transform(({ value }) => value || null)
-    userId?: number;
+    userId: number;
+}
+
+export class UpdateArticle extends PickType(ArticleDto, ['title', 'contents'] ) {
+    @IsOptional()
+    @Transform(({ value }) => value || null)
+    userId: number;
 }
 
 export class RemoveArticle extends PickType(Article, ['id'] as const) {

@@ -1,11 +1,4 @@
-import { 
-    Entity,
-    PrimaryGeneratedColumn,
-    CreateDateColumn,
-    DeleteDateColumn,
-    Column,
-    ManyToOne
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { Users } from './Users';
 
 @Entity("alarms")
@@ -28,6 +21,7 @@ export class Alarm {
     @DeleteDateColumn({ type: 'timestamp', nullable: true })
     deletedAt: Date | null;
 
-    @ManyToOne(() => Users, (user) => user.alarms)
+    @ManyToOne(() => Users, (user) => user.alarms, { eager: true })
+    @JoinColumn({ name: 'userId' })
     user: Users;
 }

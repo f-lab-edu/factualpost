@@ -58,8 +58,20 @@ export class UserRepository {
         }
     }
 
+    async findByPk(id: number): Promise<Users> {
+        const user = await this.userRepository.findOneBy({ id: id });
+        if(!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
     async findById(userId: string): Promise<Users> {
-        const user = await this.userRepository.findOneBy({ userId: userId });
+        const user = await this.userRepository.findOne({
+            where: {
+                userId: userId,
+            }
+        });
         if (!user) {
             throw new NotFoundException('User not found');
         }

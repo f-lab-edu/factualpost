@@ -9,9 +9,7 @@ import { AuthTokenService } from "./service/auth.token.service";
 
 @Module({
     imports: [
-        JwtModule.register({
-            secret: process.env.JWT_SECRET_KEY,
-        }),
+        JwtModule,
         RedisModule,
     ],
     providers: [
