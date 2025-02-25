@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from 'jsonwebtoken';
+import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { UserDTO, Tokens } from "src/types";
 
 @Injectable()
@@ -46,7 +47,7 @@ export class AuthTokenService {
 
     async verifyRefreshToken(providedToken: string, storedToken: string): Promise<void> {
         if (providedToken !== storedToken) {
-            throw new UnauthorizedException('Invalid refresh token');
+            throw new UnauthorizedException(ERROR_MESSAGES.INVALID_REFRESH_TOKEN);
         }
     }
 }

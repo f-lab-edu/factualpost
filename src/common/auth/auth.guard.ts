@@ -3,14 +3,19 @@ import { JwtService } from "@nestjs/jwt";
 import { AuthService } from "./service/auth.service";
 import { ConfigService } from "@nestjs/config";
 import { UserDTO } from "src/types";
+import { ERROR_MESSAGES } from "../constants/error-message";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+
+    private readonly jwtSecret: string;
     constructor(
         private readonly jwtService: JwtService,
         private readonly authService: AuthService,
         private readonly configService: ConfigService
-    ){}
+    ){
+        this.jwtSecret = this.configService.get<string>('JWT_SECRET_KEY') || '';
+    }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -18,7 +23,6 @@ export class JwtAuthGuard implements CanActivate {
         const token = await this.splitAuthHeader(authHeader);
         try { 
             request.user = await this.extractUserData(token);
-            console.log(request.user);
             return true;
         } catch(err) {
             return await this.handleExpiredToken(err.message, token, request);
@@ -39,7 +43,7 @@ export class JwtAuthGuard implements CanActivate {
     private async extractAuthHeader(request: any): Promise<string> {
         const authHeader = request.headers['authorization'];
         if(!authHeader) {
-            throw new UnauthorizedException('Authorization header not found');
+            throw new UnauthorizedException(ERROR_MESSAGES.MISSING_AUTH_HEADER);
         }
         return authHeader;
     }
@@ -47,24 +51,19 @@ export class JwtAuthGuard implements CanActivate {
     private async splitAuthHeader(authHeader: string): Promise<string> {
         const [bearer, token] = authHeader.split(' ');
         if(bearer !== 'Bearer' || !token) {
-            throw new UnauthorizedException('Invalid Bearer token');
+            throw new UnauthorizedException(ERROR_MESSAGES.INVALID_BEARER_TOKEN);
         }
         return token;
     }
 
     private async extractUserData(token: string): Promise<UserDTO> {
-        try {
-            const userProfile = this.jwtService.verify(token, {
-                secret: this.configService.get<string>('JWT_SECRET_KEY'),
+        const userProfile = this.jwtService.verify(token, {
+                secret: this.jwtSecret,
             });
-            const { iat, exp, ...user } = userProfile;
-            return user;
-        } catch (error) {
-            throw error;
-        }
+        const { iat, exp, ...user } = userProfile;
+        return user;
     }
     
-
     private async decodeUserData(token: string): Promise<UserDTO> {
         const userProfile =  this.jwtService.decode(token);
         const {iat, exp, ...user} = userProfile;

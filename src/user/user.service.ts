@@ -19,7 +19,7 @@ export class UserService {
     }
 
     async signOut(userData: SignOutUser): Promise<void> {
-        const user = await this.userRepository.findById(userData.userId);
+        const user = await this.userRepository.findByUserId(userData.userId);
         await this.userValidation.verifyPassword(userData.password, user.password);
         await this.userRepository.signOut(userData.userId);
     }
@@ -34,7 +34,7 @@ export class UserService {
     }
 
     async findById(userId: string): Promise<UserDTO> {
-        return await this.userRepository.findById(userId);
+        return await this.userRepository.findByUserId(userId);
     }
 
     async findAll(page: string): Promise<UserDTO[]> {

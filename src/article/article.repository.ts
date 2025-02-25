@@ -1,8 +1,9 @@
-import { HttpException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { RemoveArticle, UpdateArticle } from "./dtos/article.dto";
 import { Article } from "src/entities/Article";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
+import { ERROR_MESSAGES } from "src/common/constants/error-message";
 
 @Injectable()
 export class ArticleRepository {
@@ -28,7 +29,7 @@ export class ArticleRepository {
     async findById(articleId: number): Promise<Article> {
         const article = await this.articleRepository.findOneBy({ id: articleId });
         if(!article) {
-            throw new HttpException('not found article', 404);
+            throw new NotFoundException(ERROR_MESSAGES.ARTICLE_NOT_FOUND);
         }
         return article;
     }

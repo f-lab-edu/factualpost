@@ -1,10 +1,11 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "src/entities/Users";
 import { Repository } from "typeorm";
 import { DataSource } from 'typeorm';
 import { SignInUser } from "./dtos/user.dto";
 import { UserDTO } from "src/types";
+import { ERROR_MESSAGES } from "src/common/constants/error-message";
 
 @Injectable()
 export class UserRepository {
@@ -58,22 +59,24 @@ export class UserRepository {
         }
     }
 
-    async findByPk(id: number): Promise<Users> {
-        const user = await this.userRepository.findOneBy({ id: id });
+    async findById(id: number): Promise<Users> {
+        const user = await this.userRepository.findOneBy({ 
+            id: id 
+        });
         if(!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
         }
         return user;
     }
 
-    async findById(userId: string): Promise<Users> {
+    async findByUserId(userId: string): Promise<Users> {
         const user = await this.userRepository.findOne({
             where: {
                 userId: userId,
             }
         });
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
         }
         return user;
     }

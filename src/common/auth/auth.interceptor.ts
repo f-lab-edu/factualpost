@@ -12,7 +12,6 @@ export class JwtInterceptor implements NestInterceptor {
         return next.handle().pipe(
             map((data) => {
                 if(request.newAccessToken) {
-                    console.log(request.newAccessToken);
                     response.setHeader('Authorization', `Bearer ${request.newAccessToken}`);
                 }
                 return data;

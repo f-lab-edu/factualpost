@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateArticle, UpdateArticle } from "./dtos/article.dto";
 import { ArticleRepository } from "./article.repository";
 import { UserRepository } from "src/user/user.repository";
 import { Article } from "src/entities/Article";
+import { ERROR_MESSAGES } from "src/common/constants/error-message";
 
 @Injectable()
 export class ArticleService {
@@ -12,9 +13,9 @@ export class ArticleService {
     ){}
 
     async write(articleData: CreateArticle): Promise<number> {
-        const user = await this.userRepository.findByPk(articleData.userId);
+        const user = await this.userRepository.findById(articleData.userId);
         if (!user) {
-            throw new Error('User not found');
+            throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
         }
         const article = new Article();
         article.title = articleData.title;
@@ -26,15 +27,15 @@ export class ArticleService {
     async update(articleData: UpdateArticle, articleId: number): Promise<void> {
         const article = await this.articleRepository.findById(articleId);
         if(article.user.id !== articleData.userId) {
-            throw new UnauthorizedException();
+            throw new ForbiddenException(ERROR_MESSAGES.UNAUTHORIZED_UPDATE);
         }
         await this.articleRepository.update(articleData, articleId);
     }
 
     async remove(userId: number, articleId: number) {
         const article = await this.articleRepository.findById(articleId);
-        if(article.user.id !== userId) {
-            throw new UnauthorizedException();
+        if(article?.user?.id !== userId) {
+            throw new ForbiddenException(ERROR_MESSAGES.UNAUTHORIZED_DELETE);
         }
         await this.articleRepository.remove(article);
     }

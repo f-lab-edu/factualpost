@@ -1,9 +1,10 @@
 import * as bcrypt from 'bcryptjs';
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserDTO } from 'src/types';
 import { ConfigService } from "@nestjs/config";
 import { UserRepository } from './user.repository';
 import { UserProfile, SignInUser, LoginUser } from 'src/types';
+import { ERROR_MESSAGES } from 'src/common/constants/error-message';
 
 @Injectable()
 export class UserValidation {
@@ -13,7 +14,7 @@ export class UserValidation {
     ){}
 
     async verifyLogin(user: LoginUser): Promise<UserProfile> {
-        const userInfo = await this.userRepository.findById(user.userId);
+        const userInfo = await this.userRepository.findByUserId(user.userId);
         await this.verifyPassword(user.password, userInfo.password);
         return this.excludePassword(userInfo);
     }
@@ -21,7 +22,7 @@ export class UserValidation {
     async verifyPassword(password: string, bcryptPassword: string): Promise<void> {
         const compareResult = await bcrypt.compare(password, bcryptPassword);
         if(!compareResult) {
-            throw new HttpException('Not matched Password or Id', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
         }
     }
 
