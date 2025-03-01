@@ -14,7 +14,7 @@ describe("UserValidation", () => {
     let encryptService: jest.Mocked<IEncryptService>;
     let configService: jest.Mocked<IConfigService>;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 UserValidation,
@@ -39,6 +39,10 @@ describe("UserValidation", () => {
         configService = module.get("CONFIG_SERVICE");
     });
 
+    beforeEach(() => {
+        jest.clearAllMocks(); // 각 테스트 실행 전 모든 mock 초기화
+    });
+
     it("verifyLogin - should return user profile if credentials are correct", async () => {
         const mockUser: Users = { 
             id: 1,
@@ -50,7 +54,7 @@ describe("UserValidation", () => {
             likes: [],
             articles: [],
         };
-        
+
         const loginUser: LoginUser = { userId: "testUser", password: "plainPassword" };
 
         userRepository.findByUserId.mockResolvedValue(mockUser);
@@ -72,7 +76,7 @@ describe("UserValidation", () => {
             likes: [],
             articles: [],
         };
-        
+
         const loginUser: LoginUser = { userId: "testUser", password: "wrongPassword" };
 
         userRepository.findByUserId.mockResolvedValue(mockUser);

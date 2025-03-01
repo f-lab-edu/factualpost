@@ -33,4 +33,20 @@ export class ArticleRepository {
         }
         return article;
     }
+
+    async findOne(articleId: number): Promise<Article> {
+        const article = await this.articleRepository
+            .createQueryBuilder('article')
+            .leftJoinAndSelect('article.user', 'user')
+            .where('article.id = :id', { id: articleId })
+            .getOne();
+    
+        if (!article) {
+            throw new NotFoundException(ERROR_MESSAGES.ARTICLE_NOT_FOUND);
+        }
+    
+        return article;
+    }
+    
+    
 }

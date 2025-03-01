@@ -42,4 +42,12 @@ export class LikeRepository {
         await this.likeRepository.restore(like.id);
     }
 
+    async findUsersWhoLikedArticle(articleId: number): Promise<Like[]> {
+        return await this.likeRepository
+                        .createQueryBuilder('like')
+                        .leftJoinAndSelect('like.user', 'user')
+                        .where('like.article.id = :articleId', {articleId})
+                        .getMany();
+    }
+
 }

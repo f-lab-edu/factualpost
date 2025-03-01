@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn } from 'typeorm';
 import { Users } from './Users';
 import { Like } from './Like';
+import { Alarm } from './Alarm';
 
 @Entity('articles')
 export class Article {
@@ -28,4 +29,7 @@ export class Article {
 
     @OneToMany(() => Like, (like) => like.article)
     likes: Like[];
+
+    @OneToMany(() => Alarm, (alarm) => alarm.article)
+    alarms: Alarm[];
 }

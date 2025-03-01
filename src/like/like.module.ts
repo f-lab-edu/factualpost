@@ -30,6 +30,9 @@ import { AppConfigModule } from "src/common/configs/config.module";
         LikeService,
         LikeRepository
     ],
+    exports:[
+        LikeRepository,
+    ]
 })
 
 export class LikeModule {}
