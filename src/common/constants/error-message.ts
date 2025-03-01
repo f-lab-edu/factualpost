@@ -8,4 +8,5 @@ export const ERROR_MESSAGES = {
     REFRESH_TOKEN_NOT_FOUND: 'Refresh token is missing. Please log in again.',
     INVALID_REFRESH_TOKEN: 'Invalid or expired refresh token. Please reauthenticate.',
     INCORRECT_CREDENTIALS: 'Incorrect username or password. Please check your credentials.',
+    ARTICLE_USER_NOT_FOUND: 'The requested article and user were not found.'
 };

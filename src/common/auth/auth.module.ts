@@ -6,9 +6,11 @@ import { JwtAuthGuard } from "./auth.guard";
 import { JwtInterceptor } from "./auth.interceptor";
 import { AuthCacheService } from "./service/auth.cache.service";
 import { AuthTokenService } from "./service/auth.token.service";
+import { AppConfigModule } from "../configs/config.module";
 
 @Module({
     imports: [
+        AppConfigModule,
         JwtModule,
         RedisModule,
     ],

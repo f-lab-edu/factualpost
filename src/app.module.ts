@@ -9,6 +9,9 @@ import { DatabaseService } from './common/database/database.service';
 import { ArticleModule } from './article/article.module';
 import { getDatabaseConfig } from './common/configs/database.config';
 import userConfig from './common/configs/user.config';
+import { LikeModule } from './like/like.module';
+import { AppConfigModule } from './common/configs/config.module';
+import { EncryptModule } from './user/encrypts/encrypt.module';
 
 @Module({
     imports: [
@@ -21,11 +24,14 @@ import userConfig from './common/configs/user.config';
             inject: [ConfigService],
             useFactory: getDatabaseConfig,
         }),
+        AppConfigModule,
         AuthModule,
         UserModule,
         ValidatorModule,
         RedisModule,
-        ArticleModule
+        ArticleModule,
+        LikeModule,
+        EncryptModule,
     ],
     providers: [
         DatabaseService

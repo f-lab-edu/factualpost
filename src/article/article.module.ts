@@ -9,12 +9,14 @@ import { JwtModule } from "@nestjs/jwt";
 import { Article } from "src/entities/Article";
 import { AttachUserInterceptor } from "src/common/interceptor/attach.user.interceptor";
 import { UserModule } from "src/user/user.module";
+import { AppConfigModule } from "src/common/configs/config.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             Article
         ]),
+        AppConfigModule,
         AuthModule,
         ConfigModule,
         JwtModule,
@@ -26,7 +28,9 @@ import { UserModule } from "src/user/user.module";
         ArticleRepository,
         AttachUserInterceptor,
     ],
-    exports: []
+    exports: [
+        ArticleRepository,
+    ]
 })
 
 export class ArticleModule {}

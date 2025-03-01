@@ -1,33 +1,34 @@
-import * as bcrypt from 'bcryptjs';
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { UserDTO } from 'src/types';
-import { ConfigService } from "@nestjs/config";
 import { UserRepository } from './user.repository';
-import { UserProfile, SignInUser, LoginUser } from 'src/types';
+import { UserProfile, LoginUser } from 'src/types';
 import { ERROR_MESSAGES } from 'src/common/constants/error-message';
+import { CONFIG_SERVICE, IConfigService } from 'src/common/configs/config.interface.service';
+import { ENCRYPT_SERVICE, IEncryptService } from './encrypts/encrypt.interface';
 
 @Injectable()
 export class UserValidation {
     constructor(
-        private readonly configService: ConfigService,
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
+        @Inject(ENCRYPT_SERVICE) private readonly encryptService: IEncryptService,
         private readonly userRepository: UserRepository,
     ){}
 
     async verifyLogin(user: LoginUser): Promise<UserProfile> {
         const userInfo = await this.userRepository.findByUserId(user.userId);
-        await this.verifyPassword(user.password, userInfo.password);
-        return this.excludePassword(userInfo);
-    }
-
-    async verifyPassword(password: string, bcryptPassword: string): Promise<void> {
-        const compareResult = await bcrypt.compare(password, bcryptPassword);
+        const compareResult = await this.comparePassword(user.password, userInfo.password);
         if(!compareResult) {
             throw new BadRequestException(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
         }
+        return this.excludePassword(userInfo);
     }
 
-    async encodePassword(user: SignInUser): Promise<void> {
-        user.password = await bcrypt.hash(user.password, this.configService.get<number>('user.passwordRound')!);
+    async comparePassword(password: string, bcryptPassword: string): Promise<boolean> {
+        return await this.encryptService.compare(password, bcryptPassword);
+    }
+
+    async encodePassword(password: string): Promise<string> {
+        return await this.encryptService.hash(password, this.configService.getPasswordRound());
     }
 
     async checkInputRange(target: string, min: number, max: number): Promise<boolean> {
@@ -35,9 +36,7 @@ export class UserValidation {
     }
 
     async containSpecialCharacter(password: string): Promise<boolean> {
-        const specialCharRegexString = this.configService.get<string>('user.specialType')!;
-        const specialCharRegex = new RegExp(specialCharRegexString);
-        return specialCharRegex.test(password);
+        return this.configService.getSpecialCharRegex().test(password);
     }
 
     private excludePassword(user: UserDTO): UserProfile {

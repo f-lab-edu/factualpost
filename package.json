@@ -6,7 +6,10 @@
   "scripts": {
     "build": "nest build",
     "start:dev": "nest start --watch",
-    "start:prod": "node ."
+    "start:prod": "node .",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -38,11 +41,15 @@
   "devDependencies": {
     "@nestjs/cli": "^11.0.2",
     "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.11",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
     "@typescript-eslint/parser": "^8.24.1",
     "eslint": "^9.21.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.6",
     "typescript": "^5"
   }
 }
