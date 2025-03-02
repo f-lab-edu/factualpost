@@ -8,6 +8,8 @@ import { UserValidation } from "./user.validation";
 import { UserRepository } from "./user.repository";
 import { AuthModule } from "src/common/auth/auth.module";
 import { JwtModule } from "@nestjs/jwt";
+import { AppConfigModule } from "src/common/configs/config.module";
+import { EncryptModule } from "./encrypts/encrypt.module";
 
 @Module({
     imports: [
@@ -16,7 +18,9 @@ import { JwtModule } from "@nestjs/jwt";
         ]),
         AuthModule,
         ConfigModule,
-        JwtModule
+        JwtModule,
+        AppConfigModule,
+        EncryptModule,
     ],
     controllers: [
         UserController

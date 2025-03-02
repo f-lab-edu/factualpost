@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import { ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments } from 'class-validator';
 import { UserValidation } from 'src/user/user.validation';
+import { CONFIG_SERVICE, IConfigService } from '../configs/config.interface.service';
+
+interface Range {
+    min: number;
+    max: number;
+}
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -12,16 +17,16 @@ export class RangeValidator implements ValidatorConstraintInterface {
     };
 
     constructor(
-        private readonly configService: ConfigService,
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
         private readonly userValidation: UserValidation,
     ) {}
 
-    private getConfigValues(property: string): { min: number, max: number } | null {
+    private getConfigValues(property: string): Range | null {
         const minKey = `user.${property}.min`;
         const maxKey = `user.${property}.max`;
 
-        const min = this.configService.get<number>(minKey);
-        const max = this.configService.get<number>(maxKey);
+        const min = this.configService.getUserConfigValue(minKey);
+        const max = this.configService.getUserConfigValue(maxKey);
 
         if (min === undefined || max === undefined) {
             console.error(`설정값을 찾을 수 없습니다: ${minKey}, ${maxKey}`);
@@ -33,7 +38,9 @@ export class RangeValidator implements ValidatorConstraintInterface {
 
     async validate(value: any, args: ValidationArguments): Promise<boolean> {
         const range = this.getConfigValues(args.property);
-        if (!range) return false;
+        if (!range) {
+            return false;
+        }
 
         return await this.userValidation.checkInputRange(value, range.min, range.max);
     }

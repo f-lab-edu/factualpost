@@ -6,7 +6,9 @@ import { ConfigService } from "@nestjs/config";
 export class RedisConnectionService implements OnModuleInit, OnModuleDestroy {
     private redisClient: RedisClientType;
 
-    constructor(private readonly configService: ConfigService) {
+    constructor(
+        private readonly configService: ConfigService
+    ) {
         const redisPort = this.configService.get<string>('REDIS_PORT_NUMBER') || '6379';
         this.redisClient = createClient({ url: `redis://localhost:${redisPort}` });
         this.redisClient.on('error', (err) => {

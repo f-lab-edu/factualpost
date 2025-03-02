@@ -14,13 +14,14 @@ export class UserService {
     ){}
 
     async signUp(userData: SignInUser): Promise<void> {
-        await this.userValidation.encodePassword(userData);
-        await this.userRepository.createUser(userData);
+        const encodedPassword = await this.userValidation.encodePassword(userData.password);
+        const userWithEncodedPassword = {...userData, password: encodedPassword};
+        await this.userRepository.createUser(userWithEncodedPassword);
     }
 
     async signOut(userData: SignOutUser): Promise<void> {
         const user = await this.userRepository.findByUserId(userData.userId);
-        await this.userValidation.verifyPassword(userData.password, user.password);
+        await this.userValidation.validatePassword(userData.password, user.password);
         await this.userRepository.signOut(userData.userId);
     }
 

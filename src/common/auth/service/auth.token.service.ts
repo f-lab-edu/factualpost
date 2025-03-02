@@ -1,7 +1,7 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from 'jsonwebtoken';
+import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { UserDTO, Tokens } from "src/types";
 
@@ -14,11 +14,11 @@ export class AuthTokenService {
 
     constructor(
         private readonly jwtService: JwtService,
-        private readonly configService: ConfigService
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService
     ) {
-        this.jwtSercretKey = this.configService.get<string>('JWT_SECRET_KEY') || 'jwtSecretKey';
-        this.accessTokenExpire = this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN_MIN') || '60m';
-        this.refreshTokenExpire = this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN_DAYS') || '14d';
+        this.jwtSercretKey = this.configService.getJwtSecretKey();
+        this.accessTokenExpire = this.configService.getAccessTokenExpiresIn();
+        this.refreshTokenExpire = this.configService.getRefreshTokenExpiresIn();
     }
 
     async generateTokens(payload: JwtPayload): Promise<Tokens> {

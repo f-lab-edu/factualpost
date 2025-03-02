@@ -1,9 +1,9 @@
-import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AuthService } from "./service/auth.service";
-import { ConfigService } from "@nestjs/config";
 import { UserDTO } from "src/types";
 import { ERROR_MESSAGES } from "../constants/error-message";
+import { CONFIG_SERVICE, IConfigService } from "../configs/config.interface.service";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -12,9 +12,9 @@ export class JwtAuthGuard implements CanActivate {
     constructor(
         private readonly jwtService: JwtService,
         private readonly authService: AuthService,
-        private readonly configService: ConfigService
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
     ){
-        this.jwtSecret = this.configService.get<string>('JWT_SECRET_KEY') || '';
+        this.jwtSecret = this.configService.getJwtSecretKey();
     }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {

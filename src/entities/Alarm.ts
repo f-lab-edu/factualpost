@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { Users } from './Users';
+import { Article } from './Article';
 
 @Entity("alarms")
 export class Alarm {
@@ -24,4 +25,8 @@ export class Alarm {
     @ManyToOne(() => Users, (user) => user.alarms, { eager: true })
     @JoinColumn({ name: 'userId' })
     user: Users;
+
+    @ManyToOne(() => Article, (article) => article.alarms)
+    @JoinColumn({ name: 'articleId' })
+    article: Article;
 }

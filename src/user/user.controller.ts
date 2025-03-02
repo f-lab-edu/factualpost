@@ -1,6 +1,6 @@
-import { Body, Controller, createParamDecorator, Delete, ExecutionContext, Get, Param, Post, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { UserDTO, UserProfile } from "src/types";
+import { UserDTO } from "src/types";
 import { SignInUser, SignOutUser, LoginUser, LogoutUser } from "./dtos/user.dto";
 import { GetUser } from "src/common/decorators/user.param.decorator";
 import { JwtAuthGuard } from "src/common/auth/auth.guard";

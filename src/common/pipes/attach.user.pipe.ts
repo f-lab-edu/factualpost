@@ -12,10 +12,9 @@ export class AttachUserPipe implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata): any {
         if (isObject(value)) {
             const user = this.request['user'];
-
             if (user?.id) {
-                value.userId = user.id;
                 value.username = user.userId;
+                value.userId = user.id;
             }
         } else {
             this.logger.warn(`AttachUserPipe: value is not an object. Skipping transformation. Value: ${value}`);

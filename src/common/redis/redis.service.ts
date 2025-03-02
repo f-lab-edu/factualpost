@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { RedisClientType } from "redis";
-import { ICacheMemory } from "../interface/interface";
+import { ICacheMemory } from "./cache.interface";
 import { RedisConnectionService } from "./redis.connection.service";
 
 @Injectable()

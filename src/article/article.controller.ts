@@ -1,10 +1,8 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Patch, Post, UseGuards, UsePipes } from "@nestjs/common";
-import { JwtAuthGuard } from "src/common/auth/auth.guard";
-import { ArticleDto, CreateArticle, UpdateArticle } from "./dtos/article.dto";
+import { CreateArticle, UpdateArticle } from "./dtos/article.dto";
 import { ArticleService } from "./article.service";
 import { GetUser } from "src/common/decorators/user.param.decorator";
 import { UserProfile } from "src/user/dtos/user.dto";
-import { AttachUserPipe } from "src/common/pipes/attach.user.pipe";
 import { UseAuth } from "src/common/decorators/user.auth.decorator";
 
 @Controller('article')
@@ -17,7 +15,6 @@ export class ArticleController {
     @Post()
     @UseAuth()
     async write(@Body() articleData: CreateArticle) {
-        console.log(articleData);
         const articleId = await this.articleService.write(articleData);
         return { location: articleId };
     }
@@ -40,5 +37,4 @@ export class ArticleController {
     ) {
         await this.articleService.remove(user.id, articleId);
     }
-
 }
