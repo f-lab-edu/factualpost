@@ -11,8 +11,8 @@ import { ERROR_MESSAGES } from "src/common/constants/error-message";
 export class AlarmService {
     constructor(
         private readonly alarmRepository: AlarmRepository,
+        private readonly articleRepository: ArticleRepository,
         private readonly likeRepository: LikeRepository,
-        private readonly articleRepository: ArticleRepository
     ){}
 
     async sendAlarms(articleId: number, userId: number): Promise<void> {

@@ -7,7 +7,6 @@ import { AuthModule } from "src/common/auth/auth.module";
 import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { Article } from "src/entities/Article";
-import { AttachUserInterceptor } from "src/common/interceptor/attach.user.interceptor";
 import { UserModule } from "src/user/user.module";
 import { AppConfigModule } from "src/common/configs/config.module";
 
@@ -26,7 +25,6 @@ import { AppConfigModule } from "src/common/configs/config.module";
     providers: [
         ArticleService,
         ArticleRepository,
-        AttachUserInterceptor,
     ],
     exports: [
         ArticleRepository,

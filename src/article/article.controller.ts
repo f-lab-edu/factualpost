@@ -37,5 +37,4 @@ export class ArticleController {
     ) {
         await this.articleService.remove(user.id, articleId);
     }
-
 }

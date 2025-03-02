@@ -1,10 +1,9 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { UserRepository } from "./user.repository";
 import { UserValidation } from "./user.validation";
 import { SignInUser, SignOutUser, LoginUser, LogoutUser } from "./dtos/user.dto";
 import { UserDTO, Tokens } from "src/types";
 import { AuthService } from "src/common/auth/service/auth.service";
-import { ERROR_MESSAGES } from "src/common/constants/error-message";
 
 @Injectable()
 export class UserService {
@@ -22,10 +21,7 @@ export class UserService {
 
     async signOut(userData: SignOutUser): Promise<void> {
         const user = await this.userRepository.findByUserId(userData.userId);
-        const compareResult = await this.userValidation.comparePassword(userData.password, user.password);
-        if(!compareResult) {
-            throw new BadRequestException(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
-        }
+        await this.userValidation.validatePassword(userData.password, user.password);
         await this.userRepository.signOut(userData.userId);
     }
 

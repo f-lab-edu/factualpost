@@ -2,7 +2,8 @@ import { Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
 import { AlarmService } from "./alarm.service";
 import { UseAuth } from "src/common/decorators/user.auth.decorator";
 import { GetUser } from "src/common/decorators/user.param.decorator";
-import { UserProfile } from "src/types";
+import { UserProfile } from "src/user/dtos/user.dto";
+import { GetAlarmParamDto } from "./dtos/alarm.dto";
 
 @Controller('alarm')
 export class AlarmController {
@@ -28,11 +29,11 @@ export class AlarmController {
     @UseAuth()
     @Get('/:cursor/:limit')
     async getAlarm(
-        @GetUser() user: UserProfile, 
-        @Param('cursor', ParseIntPipe) cursor: number,
-        @Param('limit', ParseIntPipe) limit: number,
+        @GetUser() user: UserProfile,
+        @Param() params: GetAlarmParamDto,
     ) {
-        await this.alarmService.getAlarm(user.id, cursor, limit);
+        const alarms = await this.alarmService.getAlarm(user.id, params.cursor, params.limit);
+        return alarms;
     }
     
 }

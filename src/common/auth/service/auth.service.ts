@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { UserProfile, Tokens, UserDTO } from "src/types";
+import { Tokens, UserDTO } from "src/types";
+import { UserProfile } from "src/user/dtos/user.dto";
 import { JwtPayload } from 'jsonwebtoken';
 import { AuthTokenService } from "./auth.token.service";
 import { AuthCacheService } from "./auth.cache.service";
@@ -28,5 +29,4 @@ export class AuthService {
     async logOutUser(user: LogoutUser) {
         await this.authCacheService.deleteRefreshToken(user.id.toString());
     }
-
 }

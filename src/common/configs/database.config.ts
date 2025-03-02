@@ -5,7 +5,6 @@ import { Article } from "src/entities/Article";
 import { Like } from "src/entities/Like";
 import { Users } from "src/entities/Users";
 
-
 export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
     type: 'mysql',
     host: configService.get<string>('DATABASE_HOST'),

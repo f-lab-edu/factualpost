@@ -15,7 +15,6 @@ export class LikeController {
         @Body() likeData: LikeData, 
         @Param('articleId', ParseIntPipe) articleId: number
     ) {
-        console.log(likeData);
         await this.likeService.toggleLike(Number(likeData.userId), articleId);
     }
 

@@ -7,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtInterceptor } from './common/auth/auth.interceptor';
-import { AttachUserInterceptor } from './common/interceptor/attach.user.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

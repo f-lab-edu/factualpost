@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { UserDTO } from 'src/types';
 import { UserRepository } from './user.repository';
-import { UserProfile, LoginUser } from 'src/types';
+import { UserProfile, LoginUser } from "./dtos/user.dto";
 import { ERROR_MESSAGES } from 'src/common/constants/error-message';
 import { CONFIG_SERVICE, IConfigService } from 'src/common/configs/config.interface.service';
 import { ENCRYPT_SERVICE, IEncryptService } from './encrypts/encrypt.interface';
@@ -16,11 +16,15 @@ export class UserValidation {
 
     async verifyLogin(user: LoginUser): Promise<UserProfile> {
         const userInfo = await this.userRepository.findByUserId(user.userId);
-        const compareResult = await this.comparePassword(user.password, userInfo.password);
-        if(!compareResult) {
+        await this.validatePassword(user.password, userInfo.password);
+        return this.excludePassword(userInfo);
+    }
+
+    async validatePassword(password: string, hashedPassword: string) {
+        const isValid = await this.comparePassword(password, hashedPassword);
+        if (!isValid) {
             throw new BadRequestException(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
         }
-        return this.excludePassword(userInfo);
     }
 
     async comparePassword(password: string, bcryptPassword: string): Promise<boolean> {

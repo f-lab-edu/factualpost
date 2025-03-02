@@ -47,6 +47,4 @@ export class ArticleRepository {
     
         return article;
     }
-    
-    
 }
