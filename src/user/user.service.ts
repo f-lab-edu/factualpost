@@ -22,7 +22,7 @@ export class UserService {
     async signOut(userData: SignOutUser): Promise<void> {
         const user = await this.userRepository.findByUserId(userData.userId);
         await this.userValidation.validatePassword(userData.password, user.password);
-        await this.userRepository.signOut(userData.userId);
+        await this.userRepository.signOut(user);
     }
 
     async login(userData: LoginUser): Promise<Tokens> {

@@ -5,8 +5,8 @@ import { UserRepository } from "./user.repository";
 import { IEncryptService } from "./encrypts/encrypt.interface";
 import { IConfigService } from "src/common/configs/config.interface.service";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
-import { LoginUser, UserDTO } from "src/types";
 import { Users } from "src/entities/Users";
+import { LoginUser } from "./dtos/user.dto";
 
 describe("UserValidation", () => {
     let userValidation: UserValidation;
@@ -43,76 +43,84 @@ describe("UserValidation", () => {
         jest.clearAllMocks(); // 각 테스트 실행 전 모든 mock 초기화
     });
 
-    it("verifyLogin - should return user profile if credentials are correct", async () => {
-        const mockUser: Users = { 
-            id: 1,
-            userId: "testUser",
-            password: "hashedPassword",
-            createdAt: new Date(),
-            deletedAt: new Date(),
-            alarms: [],
-            likes: [],
-            articles: [],
-        };
+    describe("#verifyLogin", () => {
+        it("should return user profile if credentials are correct", async () => {
+            const mockUser: Users = { 
+                id: 1,
+                userId: "testUser",
+                password: "hashedPassword",
+                createdAt: new Date(),
+                deletedAt: new Date(),
+                alarms: [],
+                likes: [],
+                articles: [],
+            };
 
-        const loginUser: LoginUser = { userId: "testUser", password: "plainPassword" };
+            const loginUser: LoginUser = { userId: "testUser", password: "plainPassword" };
 
-        userRepository.findByUserId.mockResolvedValue(mockUser);
-        encryptService.compare.mockResolvedValue(true);
+            userRepository.findByUserId.mockResolvedValue(mockUser);
+            encryptService.compare.mockResolvedValue(true);
 
-        const result = await userValidation.verifyLogin(loginUser);
-        expect(result).not.toHaveProperty("password");
-        expect(result.userId).toBe(mockUser.userId);
+            const result = await userValidation.verifyLogin(loginUser);
+            expect(result).not.toHaveProperty("password");
+            expect(result.userId).toBe(mockUser.userId);
+        });
+
+        it("should throw BadRequestException if password does not match", async () => {
+            const mockUser: Users = { 
+                id: 1,
+                userId: "testUser",
+                password: "hashedPassword",
+                createdAt: new Date(),
+                deletedAt: new Date(),
+                alarms: [],
+                likes: [],
+                articles: [],
+            };
+
+            const loginUser: LoginUser = { userId: "testUser", password: "wrongPassword" };
+
+            userRepository.findByUserId.mockResolvedValue(mockUser);
+            encryptService.compare.mockResolvedValue(false);
+
+            await expect(userValidation.verifyLogin(loginUser)).rejects.toThrow(BadRequestException);
+            await expect(userValidation.verifyLogin(loginUser)).rejects.toThrow(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
+        });
     });
 
-    it("verifyLogin - should throw BadRequestException if password does not match", async () => {
-        const mockUser: Users = { 
-            id: 1,
-            userId: "testUser",
-            password: "hashedPassword",
-            createdAt: new Date(),
-            deletedAt: new Date(),
-            alarms: [],
-            likes: [],
-            articles: [],
-        };
+    describe("#encodePassword", () => {
+        it("should return hashed password", async () => {
+            configService.getPasswordRound.mockReturnValue(10);
+            encryptService.hash.mockResolvedValue("hashedPassword");
 
-        const loginUser: LoginUser = { userId: "testUser", password: "wrongPassword" };
-
-        userRepository.findByUserId.mockResolvedValue(mockUser);
-        encryptService.compare.mockResolvedValue(false);
-
-        await expect(userValidation.verifyLogin(loginUser)).rejects.toThrow(BadRequestException);
-        await expect(userValidation.verifyLogin(loginUser)).rejects.toThrow(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
+            const result = await userValidation.encodePassword("myPassword");
+            expect(result).toBe("hashedPassword");
+        });
     });
 
-    it("encodePassword - should return hashed password", async () => {
-        configService.getPasswordRound.mockReturnValue(10);
-        encryptService.hash.mockResolvedValue("hashedPassword");
+    describe("#checkInputRange", () => {
+        it('should return true for valid length', async () => {
+            const result = await userValidation.checkInputRange("validString", 5, 15);
+            expect(result).toBe(true);
+        });
 
-        const result = await userValidation.encodePassword("myPassword");
-        expect(result).toBe("hashedPassword");
+        it('should return false for out of range length', async () => {
+            const result = await userValidation.checkInputRange("short", 6, 15);
+            expect(result).toBe(false);
+        });
     });
 
-    it("checkInputRange - should return true for valid length", async () => {
-        const result = await userValidation.checkInputRange("validString", 5, 15);
-        expect(result).toBe(true);
-    });
+    describe("#containSpecialCharacter", () => {
+        it("should return true if password contains special characters", async () => {
+            configService.getSpecialCharRegex.mockReturnValue(/[!@#$%^&*]/);
+            const result = await userValidation.containSpecialCharacter("password@123");
+            expect(result).toBe(true);
+        });
 
-    it("checkInputRange - should return false for out of range length", async () => {
-        const result = await userValidation.checkInputRange("short", 6, 15);
-        expect(result).toBe(false);
-    });
-
-    it("containSpecialCharacter - should return true if password contains special characters", async () => {
-        configService.getSpecialCharRegex.mockReturnValue(/[!@#$%^&*]/);
-        const result = await userValidation.containSpecialCharacter("password@123");
-        expect(result).toBe(true);
-    });
-
-    it("containSpecialCharacter - should return false if password does not contain special characters", async () => {
-        configService.getSpecialCharRegex.mockReturnValue(/[!@#$%^&*]/);
-        const result = await userValidation.containSpecialCharacter("password123");
-        expect(result).toBe(false);
+        it("should return false if password does not contain special characters", async () => {
+            configService.getSpecialCharRegex.mockReturnValue(/[!@#$%^&*]/);
+            const result = await userValidation.containSpecialCharacter("password123");
+            expect(result).toBe(false);
+        });
     });
 });

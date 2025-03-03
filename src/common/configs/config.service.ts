@@ -45,4 +45,16 @@ export class AppConfigService implements IConfigService {
     getUserConfigValue(key: string): number {
         return this.configService.get<number>(key)!;
     }
+
+    getPageLimit(): number {
+        return Number(this.configService.get<number>('PAGE_LIMIT'));
+    }
+
+    getArticlePageLimit(): number {
+        return Number(this.configService.get<number>('ARTICLE_PAGE_LIMIT'));
+    }
+
+    getAlarmPageLimit(): number {
+        return Number(this.configService.get<number>('ALARM_PAGE_LIMIT'))
+    }
 }
