@@ -1,6 +1,6 @@
 import { PickType } from "@nestjs/mapped-types";
-import { Transform } from "class-transformer";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Transform, Type } from "class-transformer";
+import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Article } from "src/entities/Article";
 
 export class ArticleDto extends PickType(Article, ['title', 'contents'] as const) {
@@ -29,4 +29,14 @@ export class RemoveArticle extends PickType(Article, ['id'] as const) {
     @IsOptional()
     @Transform(({ value }) => value || null)
     userId?: number;
+}
+
+export class GetParamArticle {
+    @Type(() => Number)
+    @IsInt()
+    cursor: number;
+
+    @Type(() => Number)
+    @IsInt()
+    limit: number;
 }

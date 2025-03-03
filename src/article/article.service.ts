@@ -13,6 +13,10 @@ export class ArticleService {
         private readonly userRepository: UserRepository,
     ){}
 
+    async getArticle(cursor: number): Promise<Article[]> {
+        return await this.articleRepository.getArticle(cursor);
+    }
+
     async write(articleData: CreateArticle): Promise<number> {
         const user = await this.userRepository.findById(articleData.userId);
         const article = this.createArticleEntity(articleData, user);

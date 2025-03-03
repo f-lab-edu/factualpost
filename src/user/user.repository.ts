@@ -1,16 +1,18 @@
-import { ConflictException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, HttpStatus, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "src/entities/Users";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { DataSource } from 'typeorm';
 import { SignInUser } from "./dtos/user.dto";
 import { UserDTO } from "src/types";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
+import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
 
 @Injectable()
 export class UserRepository {
     constructor(
         @InjectRepository(Users) private readonly userRepository: Repository<Users>,
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
         private readonly dataSource: DataSource,
     ){}
 
@@ -44,46 +46,44 @@ export class UserRepository {
     }
 
     private async isExist(userId: string): Promise<boolean> {
-        const user = await this.dataSource.getRepository(Users).findOne({
-            where: { userId },
+        return this.userRepository.exists({ 
+            where: { 
+                userId, 
+                deletedAt: IsNull() 
+            }
         });
-        return !!user;
     }
 
-    async signOut(userId: string): Promise<void> {
-        const user = await this.dataSource.getRepository(Users).findOne({
-            where: { userId },
-        });
-        if(user) {
-            await this.userRepository.softRemove(user);
-        }
+    async signOut(user: Users): Promise<void> {
+        await this.userRepository.softRemove(user);
     }
 
     async findById(id: number): Promise<Users> {
         const user = await this.userRepository.findOneBy({ 
             id: id 
         });
+
         if(!user) {
             throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
         }
+
         return user;
     }
 
     async findByUserId(userId: string): Promise<Users> {
-        const user = await this.userRepository.findOne({
-            where: {
-                userId: userId,
-            }
+        const user = await this.userRepository.findOneBy({
+            userId: userId,
         });
+
         if (!user) {
             throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
         }
+
         return user;
     }
     
-
     async findAllUser(page: number): Promise<UserDTO[]> {
-        const pageLimit = Number(process.env.PAGE_LIMIT) || 10;
+        const pageLimit = this.configService.getPageLimit();
         const offset = (page - 1) * pageLimit;
         const users = await this.userRepository.find({
             skip: offset,

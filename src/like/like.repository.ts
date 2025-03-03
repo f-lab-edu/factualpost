@@ -23,8 +23,11 @@ export class LikeRepository {
     }
 
     async saveLike(userId: number, articleId: number): Promise<Like> {
-        const user = await this.userRepository.findById(userId);
-        const article = await this.articleRepository.findById(articleId);
+
+        const [user, article] = await Promise.all([
+            this.userRepository.findById(userId),
+            this.articleRepository.findById(articleId)
+        ])
 
         if (!user || !article) {
             throw new NotFoundException(ERROR_MESSAGES.ARTICLE_USER_NOT_FOUND);

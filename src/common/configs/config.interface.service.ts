@@ -11,4 +11,7 @@ export interface IConfigService {
     getSpecialCharCount(): number;
     getUserConfigValue(key: string): number;
     getJwtSecretKey(): string;
+    getPageLimit(): number;
+    getArticlePageLimit(): number;
+    getAlarmPageLimit(): number;
 }

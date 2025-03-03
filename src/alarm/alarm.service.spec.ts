@@ -3,9 +3,10 @@ import { AlarmService } from './alarm.service';
 import { AlarmRepository } from './alarm.repository';
 import { LikeRepository } from '../like/like.repository';
 import { ArticleRepository } from '../article/article.repository';
-import { ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Article } from '../entities/Article';
 import { Like } from '../entities/Like';
+import { ERROR_MESSAGES } from 'src/common/constants/error-message';
 
 describe('AlarmService', () => {
     let service: AlarmService;
@@ -81,7 +82,9 @@ describe('AlarmService', () => {
             articleRepository.findOne.mockResolvedValue(mockArticle);
             likeRepository.findUsersWhoLikedArticle.mockResolvedValue([]);
 
-            await service.sendAlarms(1, 1);
+            await expect(service.sendAlarms(1, 1)).rejects.toThrowError(
+                new BadRequestException(ERROR_MESSAGES.NOT_EXIST_LIKED_USER)
+            );
 
             expect(alarmRepository.saveAlarms).not.toHaveBeenCalled();
         });

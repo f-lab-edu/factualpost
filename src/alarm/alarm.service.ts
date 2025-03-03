@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { AlarmRepository } from "./alarm.repository";
 import { LikeRepository } from "src/like/like.repository";
 import { ArticleRepository } from "src/article/article.repository";
@@ -19,6 +19,7 @@ export class AlarmService {
         const article = await this.getArticle(articleId);
         await this.validateArticle(article, userId);
         const likedUsers = await this.getUserLikedArticle(articleId);
+        await this.existLikedUser(likedUsers);
         const alarms = await this.createAlarms(likedUsers, article);
         await this.alarmRepository.saveAlarms(alarms);
     }
@@ -27,13 +28,19 @@ export class AlarmService {
         await this.alarmRepository.read(alarmId);
     }
 
-    async getAlarm(userId: number, cursor: number, limit: number): Promise<Alarm[]>{
-        return this.alarmRepository.getAlarms(userId, cursor, limit);
+    async getAlarm(userId: number, cursor: number): Promise<Alarm[]>{
+        return this.alarmRepository.getAlarms(userId, cursor);
     }
 
     private async validateArticle(article: Article, userId: number): Promise<void> {
-        if (!article.user || article.user.id !== userId) {
+        if (article.user?.id !== userId) {
             throw new ForbiddenException(ERROR_MESSAGES.ONLY_POST_WRITER);
+        }
+    }
+
+    private async existLikedUser(likedUsers: Like[]) {
+        if(likedUsers.length === 0) {
+            throw new BadRequestException(ERROR_MESSAGES.NOT_EXIST_LIKED_USER);
         }
     }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Injectable, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Injectable, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { UseAuth } from "src/common/decorators/user.auth.decorator";
 import { LikeData } from "./dtos/like.dto";
 import { LikeService } from "./like.service";
@@ -9,13 +9,22 @@ export class LikeController {
         private readonly likeService: LikeService,
     ){}
 
-    @Post(':articleId/like')
+    @Put(':articleId/like')
     @UseAuth()
-    async toggleLike(
+    async like(
         @Body() likeData: LikeData, 
         @Param('articleId', ParseIntPipe) articleId: number
     ) {
-        await this.likeService.toggleLike(Number(likeData.userId), articleId);
+        await this.likeService.addLike(Number(likeData.userId), articleId);
+    }
+
+    @Delete(':articleId/like')
+    @UseAuth()
+    async unlike(
+        @Body() likeData: LikeData, 
+        @Param('articleId', ParseIntPipe) articleId: number
+    ) {
+        await this.likeService.removeLike(Number(likeData.userId), articleId);
     }
 
 }

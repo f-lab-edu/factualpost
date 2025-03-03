@@ -10,5 +10,6 @@ export const ERROR_MESSAGES = {
     INCORRECT_CREDENTIALS: 'Incorrect username or password. Please check your credentials.',
     ARTICLE_USER_NOT_FOUND: 'The requested article and user were not found.',
     ONLY_POST_WRITER: 'Only post writers can send alarms.',
-    ALARM_NOT_FOUND: 'Alarm not found'
+    ALARM_NOT_FOUND: 'Alarm not found',
+    NOT_EXIST_LIKED_USER: 'No users liked the article.'
 };
