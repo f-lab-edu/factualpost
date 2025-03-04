@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Param, ParseIntPipe, Patch, Post, UseGuards, UsePipes } from "@nestjs/common";
-import { CreateArticle, UpdateArticle } from "./dtos/article.dto";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes } from "@nestjs/common";
+import { CreateArticle, GetParamArticle, UpdateArticle } from "./dtos/article.dto";
 import { ArticleService } from "./article.service";
 import { GetUser } from "src/common/decorators/user.param.decorator";
 import { UserProfile } from "src/user/dtos/user.dto";
@@ -11,6 +11,15 @@ export class ArticleController {
     constructor(
         private readonly articleService: ArticleService,
     ){}
+
+    @Get()
+    @UseAuth()
+    async getAlarm(
+        @Query('cursor') cursor: number,
+    ) {
+        const articles = await this.articleService.getArticle(cursor);
+        return articles;
+    }
 
     @Post()
     @UseAuth()

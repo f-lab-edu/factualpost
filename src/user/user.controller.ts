@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UserDTO } from "src/types";
 import { SignInUser, SignOutUser, LoginUser, LogoutUser } from "./dtos/user.dto";
@@ -42,9 +42,9 @@ export class UserController {
         return user;
     }
 
-    @Get(':page')
+    @Get('page/:page')
     @UseGuards(JwtAuthGuard)
-    async findAll(page: string): Promise<UserDTO[]> {
+    async findAll(@Param('page', ParseIntPipe) page: string): Promise<UserDTO[]> {
         const users = await this.userService.findAll(page);
         return users;
     }
