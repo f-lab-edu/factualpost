@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { CreateArticle, UpdateArticle } from "./dtos/article.dto";
 import { ArticleRepository } from "./article.repository";
-import { UserRepository } from "src/user/user.repository";
+import { UserRepository } from "src/user/repositorys/user.repository";
 import { Article } from "src/entities/Article";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Users } from "src/entities/Users";

@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ArticleRepository } from "src/article/article.repository";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Like } from "src/entities/Like";
-import { UserRepository } from "src/user/user.repository";
+import { UserRepository } from "src/user/repositorys/user.repository";
 import { Repository } from "typeorm";
 
 @Injectable()

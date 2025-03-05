@@ -5,7 +5,7 @@ import { Users } from "src/entities/Users";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { UserValidation } from "./user.validation";
-import { UserRepository } from "./user.repository";
+import { UserRepository } from "./repositorys/user.repository";
 import { AuthModule } from "src/common/auth/auth.module";
 import { JwtModule } from "@nestjs/jwt";
 import { AppConfigModule } from "src/common/configs/config.module";

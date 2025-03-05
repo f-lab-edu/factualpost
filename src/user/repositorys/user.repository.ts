@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "src/entities/Users";
 import { IsNull, Repository } from "typeorm";
 import { DataSource } from 'typeorm';
-import { SignInUser } from "./dtos/user.dto";
+import { SignInUser } from "../dtos/user.dto";
 import { UserDTO } from "src/types";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";

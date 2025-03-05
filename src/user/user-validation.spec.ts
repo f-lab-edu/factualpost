@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException } from "@nestjs/common";
 import { UserValidation } from "./user.validation";
-import { UserRepository } from "./user.repository";
+import { UserRepository } from "./repositorys/user.repository";
 import { IEncryptService } from "./encrypts/encrypt.interface";
 import { IConfigService } from "src/common/configs/config.interface.service";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";

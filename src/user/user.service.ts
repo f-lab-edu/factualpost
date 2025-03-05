@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { UserRepository } from "./user.repository";
+import { UserRepository } from "./repositorys/user.repository";
 import { UserValidation } from "./user.validation";
 import { SignInUser, SignOutUser, LoginUser, LogoutUser } from "./dtos/user.dto";
 import { UserDTO, Tokens } from "src/types";

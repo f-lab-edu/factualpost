@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { UserDTO } from 'src/types';
-import { UserRepository } from './user.repository';
+import { UserRepository } from './repositorys/user.repository';
 import { UserProfile, LoginUser } from "./dtos/user.dto";
 import { ERROR_MESSAGES } from 'src/common/constants/error-message';
 import { CONFIG_SERVICE, IConfigService } from 'src/common/configs/config.interface.service';
