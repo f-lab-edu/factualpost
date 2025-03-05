@@ -1,18 +1,18 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
-import { AlarmRepository } from "./alarm.repository";
-import { LikeRepository } from "src/like/like.repository";
-import { ArticleRepository } from "src/article/article.repository";
+import { BadRequestException, ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import { Alarm } from "src/entities/Alarm";
 import { Like } from "src/entities/Like";
 import { Article } from "src/entities/Article";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
+import { ILIKE_REPOSITORY, ILikeRepository } from "src/like/repositorys/interface/like.interface";
+import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
+import { IALARM_REPOSITORY, IAlarmRepository } from "./repositorys/alarm.interface";
 
 @Injectable()
 export class AlarmService {
     constructor(
-        private readonly alarmRepository: AlarmRepository,
-        private readonly articleRepository: ArticleRepository,
-        private readonly likeRepository: LikeRepository,
+        @Inject(IALARM_REPOSITORY) private readonly alarmRepository: IAlarmRepository,
+        @Inject(IARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
+        @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository
     ){}
 
     async sendAlarms(articleId: number, userId: number): Promise<void> {

@@ -1,13 +1,14 @@
 import { Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { RemoveArticle, UpdateArticle } from "./dtos/article.dto";
+import { RemoveArticle, UpdateArticle } from "../dtos/article.dto";
 import { Article } from "src/entities/Article";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
+import { IArticleRepository } from "./interface/article.interface";
 
 @Injectable()
-export class ArticleRepository {
+export class ArticleTypeOrmRepository implements IArticleRepository{
     
     constructor(
         @InjectRepository(Article) private readonly articleRepository: Repository<Article>,

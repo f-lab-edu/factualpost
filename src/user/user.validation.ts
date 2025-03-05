@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { UserDTO } from 'src/types';
-import { UserRepository } from './repositorys/user.repository';
+import { IUSER_REPOSITORY, IUserRepository } from "./repositorys/interface/user.repository.interface";
 import { UserProfile, LoginUser } from "./dtos/user.dto";
 import { ERROR_MESSAGES } from 'src/common/constants/error-message';
 import { CONFIG_SERVICE, IConfigService } from 'src/common/configs/config.interface.service';
@@ -11,7 +11,7 @@ export class UserValidation {
     constructor(
         @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
         @Inject(ENCRYPT_SERVICE) private readonly encryptService: IEncryptService,
-        private readonly userRepository: UserRepository,
+        @Inject(IUSER_REPOSITORY) private readonly userRepository: IUserRepository,
     ){}
 
     async verifyLogin(user: LoginUser): Promise<UserProfile> {

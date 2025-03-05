@@ -4,12 +4,13 @@ import { AlarmService } from "./alarm.service";
 import { UserModule } from "src/user/user.module";
 import { ArticleModule } from "src/article/article.module";
 import { LikeModule } from "src/like/like.module";
-import { AlarmRepository } from "./alarm.repository";
+import { AlarmTypeOrmRepository } from "./repositorys/alarm.repository";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Alarm } from "src/entities/Alarm";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthModule } from "src/common/auth/auth.module";
 import { AppConfigModule } from "src/common/configs/config.module";
+import { IALARM_REPOSITORY } from "./repositorys/alarm.interface";
 
 @Module({
     imports:[
@@ -28,7 +29,10 @@ import { AppConfigModule } from "src/common/configs/config.module";
     ],
     providers:[
         AlarmService,
-        AlarmRepository,
+        {
+            provide: IALARM_REPOSITORY,
+            useClass: AlarmTypeOrmRepository
+        }
     ],
 })
 

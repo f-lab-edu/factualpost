@@ -4,9 +4,10 @@ import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interf
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Alarm } from "src/entities/Alarm";
 import { Repository } from "typeorm";
+import { IAlarmRepository } from "./alarm.interface";
 
 @Injectable()
-export class AlarmRepository {
+export class AlarmTypeOrmRepository implements IAlarmRepository{
     constructor(
         @InjectRepository(Alarm) private readonly alarmRepository: Repository<Alarm>,
         @Inject(CONFIG_SERVICE) private readonly configService: IConfigService

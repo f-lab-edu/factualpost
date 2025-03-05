@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException } from "@nestjs/common";
 import { UserValidation } from "./user.validation";
-import { UserRepository } from "./repositorys/user.repository";
+import { IUSER_REPOSITORY, IUserRepository } from "./repositorys/interface/user.repository.interface";
 import { IEncryptService } from "./encrypts/encrypt.interface";
 import { IConfigService } from "src/common/configs/config.interface.service";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
@@ -10,7 +10,7 @@ import { LoginUser } from "./dtos/user.dto";
 
 describe("UserValidation", () => {
     let userValidation: UserValidation;
-    let userRepository: jest.Mocked<UserRepository>;
+    let userRepository: jest.Mocked<IUserRepository>;
     let encryptService: jest.Mocked<IEncryptService>;
     let configService: jest.Mocked<IConfigService>;
 
@@ -19,7 +19,7 @@ describe("UserValidation", () => {
             providers: [
                 UserValidation,
                 {
-                    provide: UserRepository,
+                    provide: "IUSER_REPOSITORY",
                     useValue: { findByUserId: jest.fn() },
                 },
                 {
@@ -34,7 +34,7 @@ describe("UserValidation", () => {
         }).compile();
 
         userValidation = module.get<UserValidation>(UserValidation);
-        userRepository = module.get(UserRepository);
+        userRepository = module.get("IUSER_REPOSITORY");
         encryptService = module.get("ENCRYPT_SERVICE");
         configService = module.get("CONFIG_SERVICE");
     });
