@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { LikeRepository } from "./like.repository";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Like } from "src/entities/Like";
+import { ILIKE_REPOSITORY, ILikeRepository } from "./repositorys/interface/like.interface";
 
 @Injectable()
 export class LikeService {
     constructor(
-        private readonly likeRepository: LikeRepository
+        @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository,
     ) {}
 
     async addLike(userId: number, articleId: number): Promise<void> {

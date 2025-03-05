@@ -1,16 +1,16 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import { CreateArticle, UpdateArticle } from "./dtos/article.dto";
-import { ArticleRepository } from "./article.repository";
-import { UserRepository } from "src/user/repositorys/user.repository";
 import { Article } from "src/entities/Article";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Users } from "src/entities/Users";
+import { IUSER_REPOSITORY, IUserRepository } from "src/user/repositorys/interface/user.repository.interface";
+import { IARTICLE_REPOSITORY, IArticleRepository } from "./repositorys/interface/article.interface";
 
 @Injectable()
 export class ArticleService {
     constructor(
-        private readonly articleRepository: ArticleRepository,
-        private readonly userRepository: UserRepository,
+        @Inject(IARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
+        @Inject(IUSER_REPOSITORY) private readonly userRepository: IUserRepository,
     ){}
 
     async getArticle(cursor: number): Promise<Article[]> {
