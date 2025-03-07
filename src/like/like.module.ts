@@ -8,8 +8,9 @@ import { AuthModule } from "src/common/auth/auth.module";
 import { UserModule } from "src/user/user.module";
 import { ArticleModule } from "src/article/article.module";
 import { LikeService } from "./like.service";
-import { LikeRepository } from "./like.repository";
+import { LikeTypeOrmRepository } from "./repositorys/like.repository";
 import { AppConfigModule } from "src/common/configs/config.module";
+import { ILIKE_REPOSITORY } from "./repositorys/interface/like.interface";
 
 @Module({
     imports:[
@@ -28,10 +29,14 @@ import { AppConfigModule } from "src/common/configs/config.module";
     ],
     providers:[
         LikeService,
-        LikeRepository
+        {
+            provide: ILIKE_REPOSITORY,
+            useClass: LikeTypeOrmRepository,
+        },
+        
     ],
     exports:[
-        LikeRepository,
+        ILIKE_REPOSITORY
     ]
 })
 

@@ -5,11 +5,12 @@ import { Users } from "src/entities/Users";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { UserValidation } from "./user.validation";
-import { UserRepository } from "./repositorys/user.repository";
+import { UserTypeOrmRepository } from "./repositorys/user.typeorm.repository";
 import { AuthModule } from "src/common/auth/auth.module";
 import { JwtModule } from "@nestjs/jwt";
 import { AppConfigModule } from "src/common/configs/config.module";
 import { EncryptModule } from "./encrypts/encrypt.module";
+import { IUSER_REPOSITORY } from "./repositorys/interface/user.repository.interface";
 
 @Module({
     imports: [
@@ -27,11 +28,14 @@ import { EncryptModule } from "./encrypts/encrypt.module";
     ],
     providers: [
         UserService,
-        UserRepository,
+        {
+            provide: IUSER_REPOSITORY,
+            useClass: UserTypeOrmRepository,
+        },
         UserValidation,
     ],
     exports:[
-        UserRepository
+        IUSER_REPOSITORY,
     ]
 })
 

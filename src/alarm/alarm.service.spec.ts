@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AlarmService } from './alarm.service';
-import { AlarmRepository } from './alarm.repository';
-import { LikeRepository } from '../like/like.repository';
-import { ArticleRepository } from '../article/article.repository';
+import { AlarmRepository } from './repositorys/alarm.repository';
+import { LikeRepository } from '../like/repositorys/like.repository';
+import { ArticleRepository } from '../article/repositorys/article.typeorm.repository';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Article } from '../entities/Article';
 import { Like } from '../entities/Like';

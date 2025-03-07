@@ -7,9 +7,10 @@ import { SignInUser } from "../dtos/user.dto";
 import { UserDTO } from "src/types";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
+import { IUserRepository } from "./interface/user.repository.interface";
 
 @Injectable()
-export class UserRepository {
+export class UserTypeOrmRepository implements IUserRepository {
     constructor(
         @InjectRepository(Users) private readonly userRepository: Repository<Users>,
         @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,

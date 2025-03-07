@@ -1,17 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ArticleRepository } from "src/article/article.repository";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Like } from "src/entities/Like";
-import { UserRepository } from "src/user/repositorys/user.repository";
+import { IUSER_REPOSITORY, IUserRepository } from "src/user/repositorys/interface/user.repository.interface";
 import { Repository } from "typeorm";
+import { ILikeRepository } from "./interface/like.interface";
+import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
 
 @Injectable()
-export class LikeRepository {
+export class LikeTypeOrmRepository implements ILikeRepository{
     constructor(
         @InjectRepository(Like) private readonly likeRepository: Repository<Like>,
-        private readonly userRepository: UserRepository,
-        private readonly articleRepository: ArticleRepository,
+        @Inject(IUSER_REPOSITORY) private readonly userRepository: IUserRepository,
+        @Inject(IARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     ){}
 
     async findByIds(userId: number, articleId: number): Promise<Like | null> {
