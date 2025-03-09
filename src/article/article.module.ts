@@ -10,6 +10,7 @@ import { Article } from "src/entities/Article";
 import { UserModule } from "src/user/user.module";
 import { AppConfigModule } from "src/common/configs/config.module";
 import { IARTICLE_REPOSITORY } from "./repositorys/interface/article.interface";
+import { SearchModule } from "src/common/search/search.module";
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { IARTICLE_REPOSITORY } from "./repositorys/interface/article.interface";
         ConfigModule,
         JwtModule,
         UserModule,
+        SearchModule,
     ],
     controllers: [ArticleController],
     providers: [

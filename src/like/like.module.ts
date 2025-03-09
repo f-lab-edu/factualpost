@@ -11,11 +11,13 @@ import { LikeService } from "./like.service";
 import { LikeTypeOrmRepository } from "./repositorys/like.repository";
 import { AppConfigModule } from "src/common/configs/config.module";
 import { ILIKE_REPOSITORY } from "./repositorys/interface/like.interface";
+import { Users } from "src/entities/Users";
 
 @Module({
     imports:[
         TypeOrmModule.forFeature([
-            Like
+            Like,
+            Users
         ]),
         AppConfigModule,
         JwtModule,

@@ -11,6 +11,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthModule } from "src/common/auth/auth.module";
 import { AppConfigModule } from "src/common/configs/config.module";
 import { IALARM_REPOSITORY } from "./repositorys/alarm.interface";
+import { SearchModule } from "src/common/search/search.module";
 
 @Module({
     imports:[
@@ -23,6 +24,7 @@ import { IALARM_REPOSITORY } from "./repositorys/alarm.interface";
         JwtModule,
         AuthModule,
         AppConfigModule,
+        SearchModule,
     ],
     controllers:[
         AlarmController,

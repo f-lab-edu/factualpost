@@ -1,12 +1,29 @@
-import { Type } from "class-transformer";
-import { IsInt } from "class-validator";
+import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
 
-export class GetAlarmParamDto {
-    @Type(() => Number)
-    @IsInt()
-    cursor: number;
+export enum SortOrder {
+    ASC = 'ASC',
+    DESC = 'DESC',
+}
 
-    @Type(() => Number)
-    @IsInt()
-    limit: number;
+export class SearchData {
+
+    @IsOptional()
+    @IsString()
+    type?: string;
+
+    @IsOptional()
+    @IsString()
+    keyword?: string;
+
+    @IsOptional()
+    @IsDate()
+    startDate?: string;
+
+    @IsOptional()
+    @IsDate()
+    endDate?: string;
+
+    @IsOptional()
+    @IsEnum(SortOrder)
+    sortOrder?: SortOrder;
 }

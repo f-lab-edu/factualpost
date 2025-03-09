@@ -13,6 +13,7 @@ import { LikeModule } from './like/like.module';
 import { AppConfigModule } from './common/configs/config.module';
 import { EncryptModule } from './user/encrypts/encrypt.module';
 import { AlarmModule } from './alarm/alarm.module';
+import { SearchModule } from './common/search/search.module';
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { AlarmModule } from './alarm/alarm.module';
         LikeModule,
         EncryptModule,
         AlarmModule,
+        SearchModule,
     ],
     providers: [
         DatabaseService

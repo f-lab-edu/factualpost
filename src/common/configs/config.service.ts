@@ -57,4 +57,12 @@ export class AppConfigService implements IConfigService {
     getAlarmPageLimit(): number {
         return Number(this.configService.get<number>('ALARM_PAGE_LIMIT'))
     }
+
+    getAlarmType(): string {
+        return this.configService.get<string>('NEW_NOTIFICATION')!;
+    }
+
+    getAdminAlarmType(): string {
+        return this.configService.get<string>('NEW_ADMIN_NOTIFICATION')!;
+    }
 }

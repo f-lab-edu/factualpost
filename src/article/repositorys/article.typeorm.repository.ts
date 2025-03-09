@@ -1,11 +1,12 @@
 import { Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { RemoveArticle, UpdateArticle } from "../dtos/article.dto";
+import { RemoveArticle, SearchArticleData, UpdateArticle } from "../dtos/article.dto";
 import { Article } from "src/entities/Article";
-import { Repository } from "typeorm";
+import { Repository, SelectQueryBuilder } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
 import { IArticleRepository } from "./interface/article.interface";
+import { SearchService } from "src/common/search/search.service";
 
 @Injectable()
 export class ArticleTypeOrmRepository implements IArticleRepository{
@@ -13,23 +14,38 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
     constructor(
         @InjectRepository(Article) private readonly articleRepository: Repository<Article>,
         @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
+        private readonly searchService: SearchService,
     ) {}
 
-    async getArticle(cursor: number): Promise<Article[]> {
+    async getArticles(searchData: SearchArticleData, cursor: number): Promise<Article[]> {
         const limit = this.configService.getArticlePageLimit();
-        const queryBuilder = this.articleRepository.createQueryBuilder("article")
-                                                    .leftJoinAndSelect("article.user", "user")
-                                                    .leftJoinAndSelect("article.likes", "like")
-                                                    .where("article.deletedAt IS NULL")
-                                                    .orderBy("article.createdAt", "DESC");
-        if (cursor) {
-            queryBuilder.andWhere("article.id < :cursor", { cursor });
-        }
-    
+        const queryBuilder = this.articleRepository
+                                .createQueryBuilder("article")
+                                .leftJoinAndSelect("article.user", "user")
+                                .leftJoinAndSelect("article.likes", "like")
+                                .where("article.deletedAt IS NULL");
+        this.searchService.applyFilter("article", queryBuilder, searchData, cursor);
+        this.searchService.applySorting("article", queryBuilder, searchData);
         queryBuilder.take(limit);
     
-        const alarms = await queryBuilder.getMany();
-        return alarms;
+        return queryBuilder.getMany();
+    }
+        
+    async getArticle(articleId: number): Promise<Article> {
+        const article = await this.articleRepository
+                                    .createQueryBuilder('article')
+                                    .leftJoinAndSelect('article.likes', 'like')
+                                    .select([
+                                        'article.id AS article_id',
+                                        'article.title AS article_title',
+                                        'article.contents AS article_contents',
+                                        'COUNT(like.id) AS like_count'
+                                    ])
+                                    .where('article.id = :articleId', { articleId })
+                                    .groupBy('article.id')
+                                    .getRawOne();
+    
+        return article;
     }
 
     async write(articleData: Article): Promise<number> {
