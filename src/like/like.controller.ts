@@ -26,5 +26,4 @@ export class LikeController {
     ) {
         await this.likeService.removeLike(Number(likeData.userId), articleId);
     }
-
 }

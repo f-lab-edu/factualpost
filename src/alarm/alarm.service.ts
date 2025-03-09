@@ -6,13 +6,16 @@ import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { ILIKE_REPOSITORY, ILikeRepository } from "src/like/repositorys/interface/like.interface";
 import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
 import { IALARM_REPOSITORY, IAlarmRepository } from "./repositorys/alarm.interface";
+import { SearchData } from "./dtos/alarm.dto";
+import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
 
 @Injectable()
 export class AlarmService {
     constructor(
         @Inject(IALARM_REPOSITORY) private readonly alarmRepository: IAlarmRepository,
         @Inject(IARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
-        @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository
+        @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository,
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
     ){}
 
     async sendAlarms(articleId: number, userId: number): Promise<void> {
@@ -20,16 +23,26 @@ export class AlarmService {
         await this.validateArticle(article, userId);
         const likedUsers = await this.getUserLikedArticle(articleId);
         await this.existLikedUser(likedUsers);
-        const alarms = await this.createAlarms(likedUsers, article);
+        const type = this.configService.getAlarmType();
+        const alarms = await this.createAlarms(likedUsers, article, type);
         await this.alarmRepository.saveAlarms(alarms);
     }
 
-    async readAlarm(alarmId: number) {
+    async sendAdminAlarms(articleId: number): Promise<void> {
+        const article = await this.getArticle(articleId);
+        const likedUsers = await this.getUserLikedArticle(articleId);
+        await this.existLikedUser(likedUsers);
+        const type = this.configService.getAdminAlarmType();
+        const alarms = await this.createAlarms(likedUsers, article, type);
+        await this.alarmRepository.saveAlarms(alarms);
+    }
+
+    async readAlarm(alarmId: string) {
         await this.alarmRepository.read(alarmId);
     }
 
-    async getAlarm(userId: number, cursor: number): Promise<Alarm[]>{
-        return this.alarmRepository.getAlarms(userId, cursor);
+    async getAlarms(userId: number, searchData: SearchData, cursor: number): Promise<Alarm[]>{
+        return this.alarmRepository.getAlarms(userId, searchData, cursor);
     }
 
     private async validateArticle(article: Article, userId: number): Promise<void> {
@@ -52,15 +65,15 @@ export class AlarmService {
         return await this.articleRepository.findOne(articleId);
     }
 
-    private async createAlarms(likedUsers: Like[], article: Article): Promise<Alarm[]> {
-        return likedUsers.map(like => this.createAlarm(like, article));
+    private async createAlarms(likedUsers: Like[], article: Article, type: string): Promise<Alarm[]> {
+        return likedUsers.map(like => this.createAlarm(like, article, type));
     }  
 
-    private createAlarm(like: Like, article: Article): Alarm {
+    private createAlarm(like: Like, article: Article, type: string): Alarm {
         const alarm = new Alarm();
         alarm.user = like.user;
         alarm.article = article
-        alarm.type = 'NEW_NOTIFICATION';
+        alarm.type = type;
         alarm.message = `게시글 "${article.title}"에 대한 새로운 알림이 있습니다.`;
         alarm.isRead = false;
         return alarm;
