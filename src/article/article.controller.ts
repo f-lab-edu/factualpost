@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes } from "@nestjs/common";
-import { CreateArticle, GetParamArticle, SearchArticleData, UpdateArticle } from "./dtos/article.dto";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
+import { CreateArticle, SearchArticleData, UpdateArticle } from "./dtos/article.dto";
 import { ArticleService } from "./article.service";
 import { GetUser } from "src/common/decorators/user.param.decorator";
 import { UserProfile } from "src/user/dtos/user.dto";
@@ -15,10 +15,9 @@ export class ArticleController {
     @Get()
     @UseAuth()
     async getArticlePage(
-        @Body() searchData: SearchArticleData,
-        @Query('cursor') cursor: number,
+        @Query() searchQuery: SearchArticleData,
     ) {
-        const articles = await this.articleService.getArticles(searchData, cursor);
+        const articles = await this.articleService.getArticles(searchQuery);
         return articles;
     }
 

@@ -13,8 +13,8 @@ export class ArticleService {
         @Inject(IUSER_REPOSITORY) private readonly userRepository: IUserRepository,
     ){}
 
-    async getArticles(searchData: SearchArticleData, cursor: number): Promise<Article[]> {
-        return await this.articleRepository.getArticles(searchData, cursor);
+    async getArticles(searchQuery: SearchArticleData): Promise<Article[]> {
+        return await this.articleRepository.getArticles(searchQuery);
     }
 
     async getArticle(articleId: number): Promise<Article> {

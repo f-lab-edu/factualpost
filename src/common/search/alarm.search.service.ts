@@ -1,35 +1,35 @@
 import { Injectable } from "@nestjs/common";
-import { SearchData, SortOrder } from "src/alarm/dtos/alarm.dto";
+import { SearchAlarmData, SortOrder } from "src/alarm/dtos/alarm.dto";
 import { SearchStrategy } from "src/common/search/interface/search.interface";
 import { Alarm } from "src/entities/Alarm";
 import { SelectQueryBuilder } from "typeorm";
 
 @Injectable()
 export class AlarmSearch implements SearchStrategy<Alarm> {
-    applyFilters(queryBuilder: SelectQueryBuilder<Alarm>, searchData: any, cursor?: number): void {
-        if (searchData.type) {
-            queryBuilder.andWhere("alarm.type = :type", { type: searchData.type });
+    applyFilters(queryBuilder: SelectQueryBuilder<Alarm>, searchQuery: SearchAlarmData): void {
+        if (searchQuery.type) {
+            queryBuilder.andWhere("alarm.type = :type", { type: searchQuery.type });
         }
     
-        if (searchData.keyword) {
-            queryBuilder.andWhere("alarm.message LIKE :keyword", { keyword: `%${searchData.keyword}%` });
+        if (searchQuery.keyword) {
+            queryBuilder.andWhere("alarm.message LIKE :keyword", { keyword: `%${searchQuery.keyword}%` });
         }
     
-        if (searchData.startDate) {
-            queryBuilder.andWhere("alarm.createdAt >= :startDate", { startDate: searchData.startDate });
+        if (searchQuery.startDate) {
+            queryBuilder.andWhere("alarm.createdAt >= :startDate", { startDate: searchQuery.startDate });
         }
     
-        if (searchData.endDate) {
-            queryBuilder.andWhere("alarm.createdAt <= :endDate", { endDate: searchData.endDate });
+        if (searchQuery.endDate) {
+            queryBuilder.andWhere("alarm.createdAt <= :endDate", { endDate: searchQuery.endDate });
         }
 
-        if (cursor) {
-            queryBuilder.andWhere("alarm.id < :cursor", { cursor });
+        if (searchQuery.cursor) {
+            queryBuilder.andWhere("alarm.id < :cursor", { cursor: searchQuery.cursor });
         }
     }
 
-    applySorting(queryBuilder: SelectQueryBuilder<Alarm>, searchData: SearchData): void {
-        const order = searchData.sortOrder || SortOrder.DESC;
+    applySorting(queryBuilder: SelectQueryBuilder<Alarm>, searchQuery: SearchAlarmData): void {
+        const order = searchQuery.sortOrder || SortOrder.DESC;
         queryBuilder.orderBy("alarm.createdAt", order);
     }
 }

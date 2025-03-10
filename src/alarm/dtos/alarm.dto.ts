@@ -1,3 +1,4 @@
+import { Transform } from "class-transformer";
 import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
 
 export enum SortOrder {
@@ -5,23 +6,22 @@ export enum SortOrder {
     DESC = 'DESC',
 }
 
-export class SearchData {
+export class SearchAlarmData {
+    @IsOptional()
+    @Transform(({ value }) => parseInt(value, 10))
+    cursor?: number;
 
     @IsOptional()
-    @IsString()
     type?: string;
 
     @IsOptional()
-    @IsString()
-    keyword?: string;
-
-    @IsOptional()
-    @IsDate()
     startDate?: string;
 
     @IsOptional()
-    @IsDate()
     endDate?: string;
+
+    @IsOptional()
+    keyword?: string;
 
     @IsOptional()
     @IsEnum(SortOrder)

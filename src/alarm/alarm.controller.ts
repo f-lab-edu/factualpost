@@ -3,7 +3,7 @@ import { AlarmService } from "./alarm.service";
 import { UseAuth } from "src/common/decorators/user.auth.decorator";
 import { GetUser } from "src/common/decorators/user.param.decorator";
 import { UserProfile } from "src/user/dtos/user.dto";
-import { SearchData } from "./dtos/alarm.dto";
+import { SearchAlarmData } from "./dtos/alarm.dto";
 
 @Controller('alarm')
 export class AlarmController {
@@ -15,10 +15,9 @@ export class AlarmController {
     @Get()
     async getAlarms(
         @GetUser() user: UserProfile,
-        @Body() searchData: SearchData,
-        @Query('cursor') cursor: number,
+        @Query() searchQuery: SearchAlarmData,
     ) {
-        const alarms = await this.alarmService.getAlarms(user.id, searchData, cursor);
+        const alarms = await this.alarmService.getAlarms(user.id, searchQuery);
         return alarms;
     }
 

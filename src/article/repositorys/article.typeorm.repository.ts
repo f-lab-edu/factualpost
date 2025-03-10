@@ -17,15 +17,15 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
         private readonly searchService: SearchService,
     ) {}
 
-    async getArticles(searchData: SearchArticleData, cursor: number): Promise<Article[]> {
+    async getArticles(searchQuery: SearchArticleData): Promise<Article[]> {
         const limit = this.configService.getArticlePageLimit();
         const queryBuilder = this.articleRepository
                                 .createQueryBuilder("article")
                                 .leftJoinAndSelect("article.user", "user")
                                 .leftJoinAndSelect("article.likes", "like")
                                 .where("article.deletedAt IS NULL");
-        this.searchService.applyFilter("article", queryBuilder, searchData, cursor);
-        this.searchService.applySorting("article", queryBuilder, searchData);
+        this.searchService.applyFilter("article", queryBuilder, searchQuery);
+        this.searchService.applySorting("article", queryBuilder, searchQuery);
         queryBuilder.take(limit);
     
         return queryBuilder.getMany();

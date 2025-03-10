@@ -6,7 +6,7 @@ import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { ILIKE_REPOSITORY, ILikeRepository } from "src/like/repositorys/interface/like.interface";
 import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
 import { IALARM_REPOSITORY, IAlarmRepository } from "./repositorys/alarm.interface";
-import { SearchData } from "./dtos/alarm.dto";
+import { SearchAlarmData } from "./dtos/alarm.dto";
 import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
 
 @Injectable()
@@ -41,8 +41,8 @@ export class AlarmService {
         await this.alarmRepository.read(alarmId);
     }
 
-    async getAlarms(userId: number, searchData: SearchData, cursor: number): Promise<Alarm[]>{
-        return this.alarmRepository.getAlarms(userId, searchData, cursor);
+    async getAlarms(userId: number, searchData: SearchAlarmData): Promise<Alarm[]>{
+        return this.alarmRepository.getAlarms(userId, searchData);
     }
 
     private async validateArticle(article: Article, userId: number): Promise<void> {

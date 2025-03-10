@@ -48,17 +48,16 @@ export enum SortOrder {
 
 export class SearchArticleData {
     @IsOptional()
-    @IsDate()
-    @Type(() => Date)
-    startDate?: Date;
+    @Transform(({ value }) => parseInt(value, 10))
+    cursor?: number;
 
     @IsOptional()
-    @IsDate()
-    @Type(() => Date)
-    endDate?: Date;
+    startDate?: string;
 
     @IsOptional()
-    @IsString()
+    endDate?: string;
+
+    @IsOptional()
     keyword?: string;
 
     @IsOptional()

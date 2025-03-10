@@ -4,7 +4,7 @@ import { Article } from "src/entities/Article"
 export const IARTICLE_REPOSITORY = "IARTICLE_REPOSITORY";
 
 export interface IArticleRepository {
-    getArticles(searchData: SearchArticleData, cursor: number): Promise<Article[]>
+    getArticles(searchQuery: SearchArticleData): Promise<Article[]>
     getArticle(articleId: number): Promise<Article>
     write(articleData: Article): Promise<number>
     update(articleData: UpdateArticle, articleId: number): Promise<void>

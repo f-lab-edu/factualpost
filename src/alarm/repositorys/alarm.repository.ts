@@ -5,7 +5,7 @@ import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Alarm } from "src/entities/Alarm";
 import { Repository } from "typeorm";
 import { IAlarmRepository } from "./alarm.interface";
-import { SearchData } from "../dtos/alarm.dto";
+import { SearchAlarmData } from "../dtos/alarm.dto";
 import { SearchService } from "src/common/search/search.service";
 
 @Injectable()
@@ -33,15 +33,15 @@ export class AlarmTypeOrmRepository implements IAlarmRepository{
         await this.alarmRepository.save(alarm);
     }
 
-    async getAlarms(userId: number, searchData: SearchData, cursor: number): Promise<Alarm[]> {
+    async getAlarms(userId: number, searchQuery: SearchAlarmData): Promise<Alarm[]> {
         const limit = this.configService.getAlarmPageLimit();
         let queryBuilder = this.alarmRepository.createQueryBuilder("alarm")
                                                 .leftJoinAndSelect("alarm.user", "user")
                                                 .leftJoinAndSelect("alarm.article", "article")
                                                 .where("alarm.userId = :userId", { userId })
                                                 .orderBy("alarm.createdAt", "DESC")
-        this.searchService.applyFilter("alarm", queryBuilder, searchData, cursor);
-        this.searchService.applySorting("alarm", queryBuilder, searchData);
+        this.searchService.applyFilter("alarm", queryBuilder, searchQuery);
+        this.searchService.applySorting("alarm", queryBuilder, searchQuery);
             
         return await queryBuilder.take(limit).getMany();
     }

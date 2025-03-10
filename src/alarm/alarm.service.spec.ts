@@ -52,12 +52,11 @@ describe('AlarmService', () => {
             },
         ],
     }).compile();
-
-    service = module.get<AlarmService>(AlarmService);
-    alarmRepository = module.get(IALARM_REPOSITORY);
-    likeRepository = module.get(ILIKE_REPOSITORY);
-    articleRepository = module.get(IARTICLE_REPOSITORY);
-    configService = module.get(CONFIG_SERVICE);
+        service = module.get<AlarmService>(AlarmService);
+        alarmRepository = module.get(IALARM_REPOSITORY);
+        likeRepository = module.get(ILIKE_REPOSITORY);
+        articleRepository = module.get(IARTICLE_REPOSITORY);
+        configService = module.get(CONFIG_SERVICE);
     });
 
     beforeEach(() => {
@@ -147,7 +146,7 @@ describe('AlarmService', () => {
 
             alarmRepository.getAlarms.mockResolvedValue(mockAlarms);
 
-            const result = await service.getAlarm(userId, searchData, cursor);
+            const result = await service.getAlarms(userId, searchData, cursor);
 
             expect(result).toEqual(mockAlarms);
             expect(alarmRepository.getAlarms).toHaveBeenCalledWith(userId, searchData, cursor);
