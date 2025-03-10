@@ -4,8 +4,8 @@ import { Article } from './Article';
 
 @Entity("alarms")
 export class Alarm {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn({ type: "bigint" })
+    id: string;
 
     @Column({ type: "varchar", nullable: false })
     type: string;

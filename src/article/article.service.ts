@@ -1,5 +1,5 @@
 import { ForbiddenException, Inject, Injectable } from "@nestjs/common";
-import { CreateArticle, UpdateArticle } from "./dtos/article.dto";
+import { CreateArticle, SearchArticleData, UpdateArticle } from "./dtos/article.dto";
 import { Article } from "src/entities/Article";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Users } from "src/entities/Users";
@@ -13,8 +13,12 @@ export class ArticleService {
         @Inject(IUSER_REPOSITORY) private readonly userRepository: IUserRepository,
     ){}
 
-    async getArticle(cursor: number): Promise<Article[]> {
-        return await this.articleRepository.getArticle(cursor);
+    async getArticles(searchQuery: SearchArticleData): Promise<Article[]> {
+        return await this.articleRepository.getArticles(searchQuery);
+    }
+
+    async getArticle(articleId: number): Promise<Article> {
+        return await this.articleRepository.getArticle(articleId);
     }
 
     async write(articleData: CreateArticle): Promise<number> {
@@ -47,6 +51,5 @@ export class ArticleService {
         article.contents = articleData.contents;
         article.user = user;
         return article;
-    }
-
+    }    
 }

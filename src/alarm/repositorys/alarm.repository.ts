@@ -5,19 +5,22 @@ import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { Alarm } from "src/entities/Alarm";
 import { Repository } from "typeorm";
 import { IAlarmRepository } from "./alarm.interface";
+import { SearchAlarmData } from "../dtos/alarm.dto";
+import { SearchService } from "src/common/search/search.service";
 
 @Injectable()
 export class AlarmTypeOrmRepository implements IAlarmRepository{
     constructor(
         @InjectRepository(Alarm) private readonly alarmRepository: Repository<Alarm>,
-        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService
+        @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
+        private readonly searchService: SearchService
     ){}
 
     async saveAlarms(alarms: Alarm[]) {
         return this.alarmRepository.save(alarms);
     }
 
-    async read(alarmId: number) {
+    async read(alarmId: string) {
         const alarm = await this.alarmRepository.findOneBy({
             id: alarmId
         });
@@ -30,21 +33,16 @@ export class AlarmTypeOrmRepository implements IAlarmRepository{
         await this.alarmRepository.save(alarm);
     }
 
-    async getAlarms(userId: number, cursor: number): Promise<Alarm[]> {
+    async getAlarms(userId: number, searchQuery: SearchAlarmData): Promise<Alarm[]> {
         const limit = this.configService.getAlarmPageLimit();
-        const queryBuilder = this.alarmRepository.createQueryBuilder("alarm")
+        let queryBuilder = this.alarmRepository.createQueryBuilder("alarm")
                                                 .leftJoinAndSelect("alarm.user", "user")
                                                 .leftJoinAndSelect("alarm.article", "article")
                                                 .where("alarm.userId = :userId", { userId })
                                                 .orderBy("alarm.createdAt", "DESC")
-        
-        if (cursor) {
-            queryBuilder.andWhere("alarm.id < :cursor", { cursor });
-        }
-    
-        queryBuilder.take(limit);
-    
-        const alarms = await queryBuilder.getMany();
-        return alarms;
+        this.searchService.applyFilter("alarm", queryBuilder, searchQuery);
+        this.searchService.applySorting("alarm", queryBuilder, searchQuery);
+            
+        return await queryBuilder.take(limit).getMany();
     }
 }

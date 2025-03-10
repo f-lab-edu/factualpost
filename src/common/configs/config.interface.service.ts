@@ -14,4 +14,6 @@ export interface IConfigService {
     getPageLimit(): number;
     getArticlePageLimit(): number;
     getAlarmPageLimit(): number;
+    getAlarmType(): string;
+    getAdminAlarmType(): string;
 }

@@ -1,6 +1,6 @@
 import { PickType } from "@nestjs/mapped-types";
 import { Transform, Type } from "class-transformer";
-import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsDate, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Article } from "src/entities/Article";
 
 export class ArticleDto extends PickType(Article, ['title', 'contents'] as const) {
@@ -39,4 +39,28 @@ export class GetParamArticle {
     @Type(() => Number)
     @IsInt()
     limit: number;
+}
+
+export enum SortOrder {
+    ASC = 'ASC',
+    DESC = 'DESC',
+}
+
+export class SearchArticleData {
+    @IsOptional()
+    @Transform(({ value }) => parseInt(value, 10))
+    cursor?: number;
+
+    @IsOptional()
+    startDate?: string;
+
+    @IsOptional()
+    endDate?: string;
+
+    @IsOptional()
+    keyword?: string;
+
+    @IsOptional()
+    @IsEnum(SortOrder)
+    sortOrder?: SortOrder;
 }
