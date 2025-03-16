@@ -14,6 +14,7 @@ export interface IConfigService {
     getPageLimit(): number;
     getArticlePageLimit(): number;
     getAlarmPageLimit(): number;
-    getAlarmType(): string;
-    getAdminAlarmType(): string;
+    getAlarmType(): number;
+    getAdminAlarmType(): number;
+    getRefreshTokenExpiresInRedis(): number;
 }

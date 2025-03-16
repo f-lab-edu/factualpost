@@ -1,32 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
+import { Entity, Column, Index, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from './base.entity';
 import { Users } from './Users';
-import { Article } from './Article';
+import { ArticleMeta } from './article-meta';
 
-@Entity("alarms")
-export class Alarm {
-    @PrimaryGeneratedColumn({ type: "bigint" })
-    id: string;
+@Entity('alarms')
+@Index('idx_user_alarms', ['userId', 'isRead', 'createdAt'])
+export class Alarm extends BaseEntity {
+    @Column({ type: 'int', nullable: false })
+    userId: number;
 
-    @Column({ type: "varchar", nullable: false })
-    type: string;
+    @Column({ type: 'bigint', nullable: true })
+    articleId: number;
 
-    @Column({ type: "text", nullable: false })
+    @Column({ type: 'tinyint', nullable: false })
+    type: number;
+
+    @Column({ type: 'text', nullable: false })
     message: string;
 
-    @Column({ type: "boolean", default: false })
+    @Column({ type: 'tinyint', width: 1, default: 0 })
     isRead: boolean;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
-
-    @DeleteDateColumn({ type: 'timestamp', nullable: true })
-    deletedAt: Date | null;
-
-    @ManyToOne(() => Users, (user) => user.alarms, { eager: true })
+    @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: Users;
 
-    @ManyToOne(() => Article, (article) => article.alarms)
+    @ManyToOne(() => ArticleMeta, (article) => article.id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'articleId' })
-    article: Article;
+    article: ArticleMeta;
 }

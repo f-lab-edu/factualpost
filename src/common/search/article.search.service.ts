@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { SearchArticleData, SortOrder } from "src/article/dtos/article.dto";
 import { SearchStrategy } from "src/common/search/interface/search.interface";
-import { Article } from "src/entities/Article";
+//import { Article } from "src/entities/Article";
+import { ArticleMeta } from "src/entities/article-meta";
 import { SelectQueryBuilder } from "typeorm";
 
 @Injectable()
-export class ArticleSearch implements SearchStrategy<Article> {
-    applyFilters(queryBuilder: SelectQueryBuilder<Article>, searchQuery: SearchArticleData): void {
+export class ArticleSearch implements SearchStrategy<ArticleMeta> {
+    applyFilters(queryBuilder: SelectQueryBuilder<ArticleMeta>, searchQuery: SearchArticleData): void {
         if (searchQuery.keyword) {
             queryBuilder.andWhere("article.title LIKE :title", { title: `%${searchQuery.keyword}%` });
         }
@@ -20,11 +21,11 @@ export class ArticleSearch implements SearchStrategy<Article> {
         }
 
         if (searchQuery.cursor) {
-            queryBuilder.andWhere("article.id < :cursor", { cursor: searchQuery.cursor });
+            queryBuilder.andWhere("article.id > :cursor", { cursor: searchQuery.cursor });
         }
     }
 
-    applySorting(queryBuilder: SelectQueryBuilder<Article>, searchQuery: SearchArticleData): void {
+    applySorting(queryBuilder: SelectQueryBuilder<ArticleMeta>, searchQuery: SearchArticleData): void {
         const order = searchQuery.sortOrder || SortOrder.DESC;
         queryBuilder.orderBy("article.createdAt", order);
     }

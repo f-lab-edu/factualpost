@@ -1,21 +1,39 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Like } from "src/entities/Like";
 import { ILIKE_REPOSITORY, ILikeRepository } from "./repositorys/interface/like.interface";
+import { CACHE_MEMORY_SERVICE, ICacheMemory } from "src/common/redis/cache.interface";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bullmq";
+import { createLikeJobData, getLikeCacheKey, LIKE_QUEUE_NAME, LikeType, SYNC_LIKES_JOB } from "./like.util";
 
 @Injectable()
 export class LikeService {
     constructor(
         @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository,
+        @Inject(CACHE_MEMORY_SERVICE) private readonly cacheService: ICacheMemory,
+        @InjectQueue(LIKE_QUEUE_NAME) private readonly likeQueue: Queue,
     ) {}
 
     async addLike(userId: number, articleId: number): Promise<void> {
+        const likeCacheKey = getLikeCacheKey(articleId);
+        this.cacheService.increment(likeCacheKey);
+        await this.likeQueue.add(SYNC_LIKES_JOB, createLikeJobData(userId, articleId, LikeType.ADD));
+    }
+
+    async removeLike(userId: number, articleId: number): Promise<void> {
+        const likeCacheKey = getLikeCacheKey(articleId);
+        this.cacheService.decrement(likeCacheKey);
+        await this.likeQueue.add(SYNC_LIKES_JOB, createLikeJobData(userId, articleId, LikeType.REMOVE));
+    }
+
+    async add(userId: number, articleId: number): Promise<void> {
         const like = await this.getLike(userId, articleId);
         like?.deletedAt
         ? await this.restore(like)
         : like ?? await this.createNewLike(userId, articleId);
     }
 
-    async removeLike(userId: number, articleId: number): Promise<void> {
+    async remove(userId: number, articleId: number): Promise<void> {
         const like = await this.getLike(userId, articleId);
         like && !like.deletedAt && await this.softDelete(like);
     }

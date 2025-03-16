@@ -58,11 +58,15 @@ export class AppConfigService implements IConfigService {
         return Number(this.configService.get<number>('ALARM_PAGE_LIMIT'))
     }
 
-    getAlarmType(): string {
-        return this.configService.get<string>('NEW_NOTIFICATION')!;
+    getAlarmType(): number {
+        return this.configService.get<number>('NEW_NOTIFICATION')!;
     }
 
-    getAdminAlarmType(): string {
-        return this.configService.get<string>('NEW_ADMIN_NOTIFICATION')!;
+    getAdminAlarmType(): number {
+        return this.configService.get<number>('NEW_ADMIN_NOTIFICATION')!;
+    }
+
+    getRefreshTokenExpiresInRedis(): number {
+        return this.configService.get<number>('REFRESH_TOKEN_EXPIRES_IN_REDIS')!;
     }
 }

@@ -1,7 +1,9 @@
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { Alarm } from "src/entities/Alarm";
-import { Article } from "src/entities/Article";
+import { ArticleContents } from "src/entities/article-contents";
+import { ArticleMeta } from "src/entities/article-meta";
+//import { Article } from "src/entities/Article";
 import { Like } from "src/entities/Like";
 import { Users } from "src/entities/Users";
 
@@ -16,8 +18,9 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
         Users,
         Like,
         Alarm,
-        Article,
+        ArticleMeta,
+        ArticleContents
     ],
     synchronize: false,
-    logging: false,
+    logging: true,
 })

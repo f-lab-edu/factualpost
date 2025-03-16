@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
 import { AlarmService } from "./alarm.service";
 import { UseAuth } from "src/common/decorators/user.auth.decorator";
 import { GetUser } from "src/common/decorators/user.param.decorator";
@@ -39,7 +39,7 @@ export class AlarmController {
 
     @UseAuth()
     @Post('read/:alarmId')
-    async readAlarm(@Param('alarmId') alarmId: string) {
+    async readAlarm(@Param('alarmId') alarmId: number) {
         await this.alarmService.readAlarm(alarmId);
     }    
 }

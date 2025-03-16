@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import { Alarm } from "src/entities/Alarm";
 import { Like } from "src/entities/Like";
-import { Article } from "src/entities/Article";
+import { ArticleMeta } from "src/entities/article-meta";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { ILIKE_REPOSITORY, ILikeRepository } from "src/like/repositorys/interface/like.interface";
 import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
@@ -37,7 +37,7 @@ export class AlarmService {
         await this.alarmRepository.saveAlarms(alarms);
     }
 
-    async readAlarm(alarmId: string) {
+    async readAlarm(alarmId: number) {
         await this.alarmRepository.read(alarmId);
     }
 
@@ -45,7 +45,7 @@ export class AlarmService {
         return this.alarmRepository.getAlarms(userId, searchData);
     }
 
-    private async validateArticle(article: Article, userId: number): Promise<void> {
+    private async validateArticle(article: ArticleMeta, userId: number): Promise<void> {
         if (article.user?.id !== userId) {
             throw new ForbiddenException(ERROR_MESSAGES.ONLY_POST_WRITER);
         }
@@ -61,15 +61,15 @@ export class AlarmService {
         return await this.likeRepository.findUsersWhoLikedArticle(articleId);
     }
 
-    private async getArticle(articleId: number): Promise<Article> {
+    private async getArticle(articleId: number): Promise<ArticleMeta> {
         return await this.articleRepository.findOne(articleId);
     }
 
-    private async createAlarms(likedUsers: Like[], article: Article, type: string): Promise<Alarm[]> {
+    private async createAlarms(likedUsers: Like[], article: ArticleMeta, type: number): Promise<Alarm[]> {
         return likedUsers.map(like => this.createAlarm(like, article, type));
     }  
 
-    private createAlarm(like: Like, article: Article, type: string): Alarm {
+    private createAlarm(like: Like, article: ArticleMeta, type: number): Alarm {
         const alarm = new Alarm();
         alarm.user = like.user;
         alarm.article = article

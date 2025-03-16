@@ -12,10 +12,9 @@ export class SearchService {
         entityType: string,
         queryBuilder: SelectQueryBuilder<T>,
         searchData: any,
-        cursor?: number,
     ): void {
         const strategy = this.strategyFactory.getStrategy(entityType);
-        strategy.applyFilters(queryBuilder, searchData, cursor);
+        strategy.applyFilters(queryBuilder, searchData);
     }
 
     applySorting<T extends ObjectLiteral>(
