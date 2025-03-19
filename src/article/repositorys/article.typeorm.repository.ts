@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { RemoveArticle, SearchArticleData, UpdateArticle } from "../dtos/article.dto";
 import { Article, ArticleWithContents, SaveArticle } from "../article.type";
 import { ArticleMeta } from "src/entities/article-meta";
-import { Repository } from "typeorm";
+import { Repository, DataSource } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
 import { CONFIG_SERVICE, IConfigService } from "src/common/configs/config.interface.service";
@@ -10,6 +10,12 @@ import { IArticleRepository } from "./interface/article.interface";
 import { SearchService } from "src/common/search/search.service";
 import { ArticleContents } from "src/entities/article-contents";
 import { CACHE_MEMORY_SERVICE, ICacheMemory } from "src/common/redis/cache.interface";
+import { UpdateLikeCount } from "src/types";
+
+interface BulkUpdateParams {
+    cases: string;
+    parameters: number[];
+}
 
 @Injectable()
 export class ArticleTypeOrmRepository implements IArticleRepository{
@@ -20,6 +26,7 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
         @Inject(CONFIG_SERVICE) private readonly configService: IConfigService,
         @Inject(CACHE_MEMORY_SERVICE) private readonly cacheService: ICacheMemory,
         private readonly searchService: SearchService,
+        @Inject(DataSource) private readonly dataSource: DataSource,
     ) {}
 
     async getArticles(searchQuery: SearchArticleData): Promise<ArticleMeta[]> {
@@ -116,4 +123,28 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
             throw new NotFoundException(ERROR_MESSAGES.ARTICLE_NOT_FOUND);
         }
     }
+
+    async bulkUpdateLikeCount(updates: UpdateLikeCount[]): Promise<void> {
+        if (updates.length === 0) return;
+
+        const { cases, parameters } = this.buildLikeCountCases(updates);
+
+        await this.dataSource.query(
+                                    `UPDATE article_meta 
+                                        SET likeCount = CASE
+                                            ${cases}
+                                        ELSE likeCount
+                                        END
+                                    `, parameters
+                                );
+    }
+
+    private buildLikeCountCases(updates: UpdateLikeCount[]): BulkUpdateParams {
+        const cases = updates
+                        .map(() => `WHEN id = ? THEN likeCount + ?`)
+                        .join('\n');
+        const parameters = updates.flatMap(u => [u.articleId, u.likeCount]);
+        return { cases, parameters };
+    }
+    
 }

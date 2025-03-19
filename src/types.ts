@@ -10,3 +10,12 @@ export interface Tokens {
     accessToken: string,
     refreshToken: string
 }
+
+export interface UpdateLikeCount {
+    articleId: number;
+    likeCount: number;
+}
+
+export interface LikeRedisKeyAndValue {
+    [key: string]: string | null;
+}

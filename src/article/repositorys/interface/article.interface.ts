@@ -1,6 +1,7 @@
 import { RemoveArticle, SearchArticleData, UpdateArticle } from "src/article/dtos/article.dto"
 import { ArticleMeta } from "src/entities/article-meta";
 import { Article, ArticleWithContents, SaveArticle } from "src/article/article.type";
+import { UpdateLikeCount } from "src/types";
 
 export const IARTICLE_REPOSITORY = "IARTICLE_REPOSITORY";
 
@@ -13,4 +14,5 @@ export interface IArticleRepository {
     findById(articleId: number): Promise<ArticleMeta>
     findOne(articleId: number): Promise<ArticleWithContents>
     updateLikeCount(storedLike: number, redisLike: number, articleId: number): Promise<void>
+    bulkUpdateLikeCount(updates: UpdateLikeCount[]): Promise<void>
 }

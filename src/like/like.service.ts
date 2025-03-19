@@ -4,7 +4,7 @@ import { ILIKE_REPOSITORY, ILikeRepository } from "./repositorys/interface/like.
 import { CACHE_MEMORY_SERVICE, ICacheMemory } from "src/common/redis/cache.interface";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bullmq";
-import { createLikeJobData, getLikeCacheKey, LIKE_QUEUE_NAME, LikeType, SYNC_LIKES_JOB } from "./like.util";
+import { createLikeJobData, getLikeCacheKey, LIKE_QUEUE_NAME, LikeType, LIKE_SYNC_JOB, LIKE_COUNT_SYNC } from "./like.util";
 
 @Injectable()
 export class LikeService {
@@ -16,14 +16,16 @@ export class LikeService {
 
     async addLike(userId: number, articleId: number): Promise<void> {
         const likeCacheKey = getLikeCacheKey(articleId);
-        this.cacheService.increment(likeCacheKey);
-        await this.likeQueue.add(SYNC_LIKES_JOB, createLikeJobData(userId, articleId, LikeType.ADD));
+        await this.cacheService.increment(likeCacheKey);
+        await this.cacheService.sAdd(LIKE_COUNT_SYNC, likeCacheKey);
+        await this.likeQueue.add(LIKE_SYNC_JOB, createLikeJobData(userId, articleId, LikeType.ADD));
     }
 
     async removeLike(userId: number, articleId: number): Promise<void> {
         const likeCacheKey = getLikeCacheKey(articleId);
-        this.cacheService.decrement(likeCacheKey);
-        await this.likeQueue.add(SYNC_LIKES_JOB, createLikeJobData(userId, articleId, LikeType.REMOVE));
+        await this.cacheService.decrement(likeCacheKey);
+        await this.cacheService.sAdd(LIKE_COUNT_SYNC, likeCacheKey);
+        await this.likeQueue.add(LIKE_SYNC_JOB, createLikeJobData(userId, articleId, LikeType.REMOVE));
     }
 
     async add(userId: number, articleId: number): Promise<void> {

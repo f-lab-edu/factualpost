@@ -1,6 +1,10 @@
 export const LIKE_QUEUE_NAME = 'like-queue';
-export const SYNC_LIKES_JOB = 'sync-likes';
-export const ARTICLE_ALL_LIKE_COUNT = 'article:*:likeCount'
+export const LIKE_SYNC_JOB = 'sync-likes';
+export const LIKE_COUNT_SYNC = 'LIKE_COUNT_SYNC';
+export const LIKE_COUNT_SYNC_TEMP = 'LIKE_COUNT_SYNC_TEMP';
+export const REDIS_KEY_LIKE_SEPARATOR = ':';
+export const LIKE_CRON_TIME = '*/1 * * * *';
+export const BATCH_SIZE = 100;
 
 export enum LikeType {
     ADD = 'add',
