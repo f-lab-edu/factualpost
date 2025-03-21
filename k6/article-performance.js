@@ -1,71 +1,79 @@
-import http from "k6/http";
-import { check, sleep } from "k6";
-import { Trend } from "k6/metrics";
-
-import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
-
-export function handleSummary(data) {
-    return {
-    "summary.html": htmlReport(data),
-    };
-}
-
-const dataReceivedTrend = new Trend("data_received_size", true);
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 
 export const options = {
-    scenarios: {
-        gradual_rps_test: {
-            executor: "ramping-arrival-rate",
-            startRate: 50,
-            timeUnit: "1s",
-            preAllocatedVUs: 500,
-            maxVUs: 800,
-            stages: [
-                { target: 100, duration: "30s" }, // 30초 동안 100 RPS로 증가
-                { target: 300, duration: "30s" }, // 30초 동안 300 RPS로 증가
-                { target: 500, duration: "1m" },  // 1분 동안 500 RPS 유지
-                { target: 0, duration: "30s" },   // 30초 동안 종료
-            ],
-        },
-    },
+    vus: 30,
+    duration: '300s',
     thresholds: {
-        http_req_failed: [{ threshold: "rate<0.05" }],
-        http_req_duration: [{ threshold: "p(95)<3000" }],
+        http_req_duration: ['p(95)<500'],
     },
 };
 
-export default function () {
-    const BASE_URL = "http://localhost:4445";
-    const ACCESS_TOKEN = "";
+const BASE_URL = 'http://localhost:4445/article';
 
-    const cursors = [117545782, 110653214, 98445622, 15664819, 64855119];
-    const cursor = cursors[Math.floor(Math.random() * cursors.length)];
+function getRandomInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-    const keyword = "";
-    const startDate = "2024-01-01";
-    const endDate = "2025-01-01";
-    const sortOrder = "DESC";
-    
-    const url = `${BASE_URL}/article?cursor=${cursor}&keyword=${keyword}&startDate=${startDate}&endDate=${endDate}&sortOrder=${sortOrder}`;
-    
-    const response = http.get(
-        url,
-        {
-            headers: {
-                "Authorization": `Bearer ${ACCESS_TOKEN}`,
-                "Content-Type": "application/json",
-            },
-            timeout: "60s",
-            tags: { name: "get_articles" },
-        },
-    );
+let userLikes = {}; // 사용자별 좋아요 상태 저장
 
-    if (response.body) dataReceivedTrend.add(response.body.length);
+function like(articleId, userId) {
+    const url = `${BASE_URL}/${articleId}/like`;
+    const headers = { 'Content-Type': 'application/json' };
+    const res = http.put(url, null, { headers });
 
-    check(response, {
-        "status is 200": (r) => r.status === 200,
-        "response is not empty": (r) => r.body.length > 0,
+    check(res, {
+        'like status 200': (r) => r.status === 200,
     });
 
+    if (res.status === 200) {
+        if (!userLikes[userId]) {
+            userLikes[userId] = new Set();
+        }
+        userLikes[userId].add(articleId);
+    } else {
+        console.log(`Like Error: ${res.status}, ${res.body}`);
+    }
+}
+
+function unlike(articleId, userId) {
+    if (userLikes[userId] && userLikes[userId].has(articleId)) {
+        const url = `${BASE_URL}/${articleId}/like`;
+        const headers = { 'Content-Type': 'application/json' };
+        const res = http.del(url, null, { headers });
+
+        check(res, {
+            'unlike status 200': (r) => r.status === 200,
+        });
+
+        if (res.status === 200) {
+            userLikes[userId].delete(articleId);
+        } else {
+            console.log(`Unlike Error: ${res.status}, ${res.body}`);
+        }
+    }
+}
+
+export default function () {
+    const ARTICLE_ID_MIN = 349708;
+    const ARTICLE_ID_MAX = 1200000;
+    const USER_ID_MAX = 1000;
+
+    const articleId = getRandomInRange(ARTICLE_ID_MIN, ARTICLE_ID_MAX);
+    const userId = getRandomInRange(1, USER_ID_MAX);
+
+    if (Math.random() < 0.5) {
+        like(articleId, userId);
+    } else {
+        unlike(articleId, userId);
+    }
+
     sleep(1);
+}
+
+export function handleSummary(data) {
+    return {
+        'result.html': htmlReport(data),
+    };
 }

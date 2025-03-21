@@ -128,7 +128,6 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
         if (updates.length === 0) return;
 
         const { cases, parameters } = this.buildLikeCountCases(updates);
-
         await this.dataSource.query(
                                     `UPDATE article_meta 
                                         SET likeCount = CASE

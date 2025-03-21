@@ -11,4 +11,5 @@ export interface ICacheMemory {
     sMembers(key: string): Promise<string[]>
     renameKey(oldKey: string, newKey: string): Promise<void>
     getKeysAndLikeCount(keys: string[]): Promise<{ [key: string]: string | null }>
+    renameTransaction(oldKey: string, newKey: string): Promise<void>
 }

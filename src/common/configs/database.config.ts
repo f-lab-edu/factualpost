@@ -22,5 +22,5 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
         ArticleContents
     ],
     synchronize: false,
-    logging: true,
+    logging: false,
 })

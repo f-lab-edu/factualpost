@@ -17,7 +17,7 @@ export class LikeCountService {
     @Cron(LIKE_CRON_TIME)
     async synchronizeLikeCount() {
         try {
-            await this.renameLikeCountKey();
+            await this.renameTransaction();
             const likeCountKeys = await this.getLikeCountKeys();
             const batches = this.chunkArrayIntoBatches(likeCountKeys, BATCH_SIZE);
 
@@ -26,7 +26,7 @@ export class LikeCountService {
                 await this.articleRepository.bulkUpdateLikeCount(updateData);
             }
 
-            await this.cacheService.remove(LIKE_COUNT_SYNC_TEMP);
+            await this.removeTempKey();
         } catch (err) {
             console.error(`[Like Count Service] Update failed: ${err.message}`, err);
         }
@@ -56,6 +56,14 @@ export class LikeCountService {
                     articleId: Number(this.extractArticleIdFromKey(key)),
                     likeCount: Number(count)
             }))
+    }
+
+    async renameTransaction() {
+        await this.cacheService.renameTransaction(LIKE_COUNT_SYNC, LIKE_COUNT_SYNC_TEMP);
+    }
+
+    async removeTempKey() {
+        await this.cacheService.remove(LIKE_COUNT_SYNC_TEMP);
     }
 
     extractArticleIdFromKey(key: string): string {

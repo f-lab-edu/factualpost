@@ -41,6 +41,7 @@ export class RedisService implements ICacheMemory{
     async sAdd(key: string, member: string): Promise<void> {
         await this.redisClient.sAdd(key, member);
     }
+
     async sMembers(key: string): Promise<string[]> {
         return await this.redisClient.sMembers(key);
     }
@@ -95,5 +96,9 @@ export class RedisService implements ICacheMemory{
         return isExists && isValidType 
             ? getResult 
             : null;
+    }
+
+    async renameTransaction(oldKey: string, newKey: string) {
+        await this.redisClient.multi().rename(oldKey, newKey).exec();
     }
 }
