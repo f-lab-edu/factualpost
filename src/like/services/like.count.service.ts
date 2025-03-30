@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { CACHE_MEMORY_SERVICE, ICacheMemory } from "src/common/redis/cache.interface";
 import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
-import { BATCH_SIZE, LIKE_COUNT_SYNC_TEMP, LIKE_COUNT_SYNC, REDIS_KEY_LIKE_SEPARATOR, LIKE_CRON_TIME } from "./like.util";
+import { BATCH_SIZE, LIKE_COUNT_SYNC_TEMP, LIKE_COUNT_SYNC, REDIS_KEY_LIKE_SEPARATOR, LIKE_CRON_TIME } from "../like.util";
 import { UpdateLikeCount } from "src/types";
 import { LikeRedisKeyAndValue } from "src/types";
 
@@ -20,12 +20,10 @@ export class LikeCountService {
             await this.renameTransaction();
             const likeCountKeys = await this.getLikeCountKeys();
             const batches = this.chunkArrayIntoBatches(likeCountKeys, BATCH_SIZE);
-
             for (const batchKeys of batches) {
                 const updateData = await this.processLikeCountBatch(batchKeys);
                 await this.articleRepository.bulkUpdateLikeCount(updateData);
             }
-
             await this.removeTempKey();
         } catch (err) {
             console.error(`[Like Count Service] Update failed: ${err.message}`, err);

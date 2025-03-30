@@ -99,6 +99,7 @@ export class RedisService implements ICacheMemory{
     }
 
     async renameTransaction(oldKey: string, newKey: string) {
+        await this.redisClient.exists(oldKey);
         await this.redisClient.multi().rename(oldKey, newKey).exec();
     }
 }

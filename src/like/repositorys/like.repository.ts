@@ -6,6 +6,7 @@ import { IUSER_REPOSITORY, IUserRepository } from "src/user/repositorys/interfac
 import { Repository } from "typeorm";
 import { ILikeRepository } from "./interface/like.interface";
 import { IARTICLE_REPOSITORY, IArticleRepository } from "src/article/repositorys/interface/article.interface";
+import { LikeRequestDto } from "../dtos/like.dto";
 
 @Injectable()
 export class LikeTypeOrmRepository implements ILikeRepository{
@@ -15,19 +16,19 @@ export class LikeTypeOrmRepository implements ILikeRepository{
         @Inject(IARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     ){}
 
-    async findByIds(userId: number, articleId: number): Promise<Like | null> {
+    async findByIds(likeRequest: LikeRequestDto): Promise<Like | null> {
         return await this.likeRepository.findOne({
-            where: { user: { id: userId }, article: { id: articleId } },
+            where: { user: { id: likeRequest.userId }, article: { id: likeRequest.articleId } },
             relations: ['user', 'article'],
             withDeleted: true
         });
     }
 
-    async saveLike(userId: number, articleId: number): Promise<Like> {
+    async saveLike(likeRequest: LikeRequestDto): Promise<Like> {
 
         const [user, article] = await Promise.all([
-            this.userRepository.findById(userId),
-            this.articleRepository.findById(articleId)
+            this.userRepository.findById(likeRequest.userId),
+            this.articleRepository.findById(likeRequest.articleId)
         ])
 
         if (!user || !article) {

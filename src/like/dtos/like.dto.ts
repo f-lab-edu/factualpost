@@ -1,4 +1,5 @@
 import { PickType } from "@nestjs/mapped-types";
+import { IsInt } from "class-validator";
 import { Like } from "src/entities/Like";
 
 
@@ -22,4 +23,9 @@ export class LikeArticleDto {
 export class ToggleLikeDto {
     user: LikeUserDto;
     article: LikeArticleDto;
+}
+
+export class LikeRequestDto {
+    userId: number;
+    articleId: number;
 }

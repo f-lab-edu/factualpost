@@ -1,58 +1,35 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { Like } from "src/entities/Like";
-import { ILIKE_REPOSITORY, ILikeRepository } from "./repositorys/interface/like.interface";
-import { CACHE_MEMORY_SERVICE, ICacheMemory } from "src/common/redis/cache.interface";
-import { InjectQueue } from "@nestjs/bull";
-import { Queue } from "bullmq";
-import { createLikeJobData, getLikeCacheKey, LIKE_QUEUE_NAME, LikeType, LIKE_SYNC_JOB, LIKE_COUNT_SYNC } from "./like.util";
+import { Injectable } from "@nestjs/common";
+import { LikePersistenceService } from "./services/like.persistence.service";
+import { LikeCacheService } from "./services/like.cache.service";
+import { LikeSyncService } from "./services/like.sync.service";
+import { LikeType } from "./like.util";
+import { LikeRequestDto } from "./dtos/like.dto";
 
 @Injectable()
 export class LikeService {
+
     constructor(
-        @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository,
-        @Inject(CACHE_MEMORY_SERVICE) private readonly cacheService: ICacheMemory,
-        @InjectQueue(LIKE_QUEUE_NAME) private readonly likeQueue: Queue,
+        private readonly likePersistenceService: LikePersistenceService,
+        private readonly likeCacheService: LikeCacheService,
+        private readonly likeSyncService: LikeSyncService
     ) {}
 
-    async addLike(userId: number, articleId: number): Promise<void> {
-        const likeCacheKey = getLikeCacheKey(articleId);
-        await this.cacheService.increment(likeCacheKey);
-        await this.cacheService.sAdd(LIKE_COUNT_SYNC, likeCacheKey);
-        await this.likeQueue.add(LIKE_SYNC_JOB, createLikeJobData(userId, articleId, LikeType.ADD));
+    async addLike(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likeCacheService.increaseLike(likeRequest.articleId);
+        await this.likeSyncService.addSyncJob(likeRequest.userId, likeRequest.articleId, LikeType.ADD);
     }
 
-    async removeLike(userId: number, articleId: number): Promise<void> {
-        const likeCacheKey = getLikeCacheKey(articleId);
-        await this.cacheService.decrement(likeCacheKey);
-        await this.cacheService.sAdd(LIKE_COUNT_SYNC, likeCacheKey);
-        await this.likeQueue.add(LIKE_SYNC_JOB, createLikeJobData(userId, articleId, LikeType.REMOVE));
+    async removeLike(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likeCacheService.decreaseLike(likeRequest.articleId);
+        await this.likeSyncService.addSyncJob(likeRequest.userId, likeRequest.articleId, LikeType.REMOVE);
     }
 
-    async add(userId: number, articleId: number): Promise<void> {
-        const like = await this.getLike(userId, articleId);
-        like?.deletedAt
-        ? await this.restore(like)
-        : like ?? await this.createNewLike(userId, articleId);
+    async add(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likePersistenceService.add(likeRequest);
     }
 
-    async remove(userId: number, articleId: number): Promise<void> {
-        const like = await this.getLike(userId, articleId);
-        like && !like.deletedAt && await this.softDelete(like);
+    async remove(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likePersistenceService.remove(likeRequest);
     }
 
-    private async restore(like: Like): Promise<void> {
-        return this.likeRepository.restoreLike(like);
-    }
-
-    private async softDelete(like: Like): Promise<void> {
-        return this.likeRepository.softDeleteLike(like);
-    }
-
-    private async getLike(userId: number, articleId: number): Promise<Like | null> {
-        return await this.likeRepository.findByIds(userId, articleId);
-    }
-
-    private async createNewLike(userId: number, articleId: number): Promise<void> {
-        await this.likeRepository.saveLike(userId, articleId);
-    }
 }
