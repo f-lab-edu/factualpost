@@ -15,6 +15,7 @@ import { UpdateLikeCount } from "src/types";
 interface BulkUpdateParams {
     cases: string;
     parameters: number[];
+    ids: number[];
 }
 
 @Injectable()
@@ -127,15 +128,17 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
     async bulkUpdateLikeCount(updates: UpdateLikeCount[]): Promise<void> {
         if (updates.length === 0) return;
 
-        const { cases, parameters } = this.buildLikeCountCases(updates);
-        await this.dataSource.query(
-                                    `UPDATE article_meta 
-                                        SET likeCount = CASE
-                                            ${cases}
-                                        ELSE likeCount
-                                        END
-                                    `, parameters
-                                );
+        const { cases, parameters, ids } = this.buildLikeCountCases(updates);
+        const idPlaceholders = ids.map(() => '?').join(', ');
+        const query = `
+                UPDATE article_meta
+                SET likeCount = CASE
+                    ${cases}
+                ELSE likeCount
+                END
+                WHERE id IN(${idPlaceholders})            
+        `;
+        await this.dataSource.query(query, [...parameters, ...ids]);
     }
 
     private buildLikeCountCases(updates: UpdateLikeCount[]): BulkUpdateParams {
@@ -143,7 +146,8 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
                         .map(() => `WHEN id = ? THEN likeCount + ?`)
                         .join('\n');
         const parameters = updates.flatMap(u => [u.articleId, u.likeCount]);
-        return { cases, parameters };
+        const ids = updates.map(u => u.articleId);
+        return { cases, parameters, ids };
     }
     
 }

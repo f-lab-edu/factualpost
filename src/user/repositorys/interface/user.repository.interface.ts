@@ -7,6 +7,7 @@ export const IUSER_REPOSITORY = 'IUSER_REPOSITORY';
 export interface IUserRepository {
     createUser(user: SignInUser): Promise<void>
     signOut(user: Users): Promise<void>
+    isExist(userId: string): Promise<boolean>
     findById(id: number): Promise<Users>
     findByUserId(userId: string): Promise<Users>
     findAllUser(page: number): Promise<UserDTO[]>

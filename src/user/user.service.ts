@@ -14,8 +14,9 @@ export class UserService {
     ){}
 
     async signUp(userData: SignInUser): Promise<void> {
+        await this.userValidation.isExistUser(userData.userId);
         const encodedPassword = await this.userValidation.encodePassword(userData.password);
-        const userWithEncodedPassword = {...userData, password: encodedPassword};
+        const userWithEncodedPassword = { ...userData, password: encodedPassword };
         await this.userRepository.createUser(userWithEncodedPassword);
     }
 
