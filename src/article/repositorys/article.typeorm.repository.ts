@@ -54,7 +54,11 @@ export class ArticleTypeOrmRepository implements IArticleRepository{
         queryBuilder.limit(limit);
 
         const articles = await queryBuilder.getMany();
-        await this.cacheService.set(articlesCacheKey, JSON.stringify(articles), 5);
+        await this.cacheService.set(
+                                    articlesCacheKey, 
+                                    JSON.stringify(articles), 
+                                    this.configService.getArticleCacheTTL()
+                                );
 
         return articles;
     }

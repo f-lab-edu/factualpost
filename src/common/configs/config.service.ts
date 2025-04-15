@@ -69,4 +69,8 @@ export class AppConfigService implements IConfigService {
     getRefreshTokenExpiresInRedis(): number {
         return this.configService.get<number>('REFRESH_TOKEN_EXPIRES_IN_REDIS')!;
     }
+
+    getArticleCacheTTL(): number {
+        return this.configService.get<number>('ARTICLE_CACHE_TTL')!;
+    }
 }

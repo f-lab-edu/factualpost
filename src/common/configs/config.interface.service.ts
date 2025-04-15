@@ -17,4 +17,5 @@ export interface IConfigService {
     getAlarmType(): number;
     getAdminAlarmType(): number;
     getRefreshTokenExpiresInRedis(): number;
+    getArticleCacheTTL(): number;
 }

@@ -11,7 +11,7 @@ export class LikeController {
     ){}
 
     @Put(':articleId/like')
-    @UseAuth()
+    //@UseAuth()
     async like(
         @Body() likeData: LikeData, 
         @Param('articleId', ParseIntPipe) articleId: number
@@ -21,7 +21,7 @@ export class LikeController {
     }
 
     @Delete(':articleId/like')
-    @UseAuth()
+   //@UseAuth()
     async unlike(
         @Body() likeData: LikeData, 
         @Param('articleId', ParseIntPipe) articleId: number

@@ -1,4 +1,5 @@
 export const CACHE_MEMORY_SERVICE = 'CACHE_MEMORY_SERVICE';
+export const ILOCK_SERVICE = 'ILOCK_SERVICE';
 
 export interface ICacheMemory {
     get(key: string): Promise<string | null>;
@@ -12,4 +13,9 @@ export interface ICacheMemory {
     renameKey(oldKey: string, newKey: string): Promise<void>
     getKeysAndLikeCount(keys: string[]): Promise<{ [key: string]: string | null }>
     renameTransaction(oldKey: string, newKey: string): Promise<void>
+}
+
+export interface ILockService {
+    acquire(key: string, ttl: number): Promise<any>;
+    release(lockOrKey: any): Promise<void>;
 }
