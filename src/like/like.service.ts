@@ -1,38 +1,35 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { Like } from "src/entities/Like";
-import { ILIKE_REPOSITORY, ILikeRepository } from "./repositorys/interface/like.interface";
+import { Injectable } from "@nestjs/common";
+import { LikePersistenceService } from "./services/like.persistence.service";
+import { LikeCacheService } from "./services/like.cache.service";
+import { LikeSyncService } from "./services/like.sync.service";
+import { LikeType } from "./like.util";
+import { LikeRequestDto } from "./dtos/like.dto";
 
 @Injectable()
 export class LikeService {
+
     constructor(
-        @Inject(ILIKE_REPOSITORY) private readonly likeRepository: ILikeRepository,
+        private readonly likePersistenceService: LikePersistenceService,
+        private readonly likeCacheService: LikeCacheService,
+        private readonly likeSyncService: LikeSyncService
     ) {}
 
-    async addLike(userId: number, articleId: number): Promise<void> {
-        const like = await this.getLike(userId, articleId);
-        like?.deletedAt
-        ? await this.restore(like)
-        : like ?? await this.createNewLike(userId, articleId);
+    async addLike(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likeCacheService.increaseLike(likeRequest.articleId);
+        await this.likeSyncService.addSyncJob(likeRequest.userId, likeRequest.articleId, LikeType.ADD);
     }
 
-    async removeLike(userId: number, articleId: number): Promise<void> {
-        const like = await this.getLike(userId, articleId);
-        like && !like.deletedAt && await this.softDelete(like);
+    async removeLike(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likeCacheService.decreaseLike(likeRequest.articleId);
+        await this.likeSyncService.addSyncJob(likeRequest.userId, likeRequest.articleId, LikeType.REMOVE);
     }
 
-    private async restore(like: Like): Promise<void> {
-        return this.likeRepository.restoreLike(like);
+    async add(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likePersistenceService.add(likeRequest);
     }
 
-    private async softDelete(like: Like): Promise<void> {
-        return this.likeRepository.softDeleteLike(like);
+    async remove(likeRequest: LikeRequestDto): Promise<void> {
+        await this.likePersistenceService.remove(likeRequest);
     }
 
-    private async getLike(userId: number, articleId: number): Promise<Like | null> {
-        return await this.likeRepository.findByIds(userId, articleId);
-    }
-
-    private async createNewLike(userId: number, articleId: number): Promise<void> {
-        await this.likeRepository.saveLike(userId, articleId);
-    }
 }

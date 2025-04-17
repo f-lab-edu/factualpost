@@ -9,7 +9,7 @@ const config = {
             max : 20
         },
         specialCharCount: 1,
-        passwordRound: 10,
+        passwordRound: 8,
         specialType : '[!@#$%^&*(),.?":{}|<>]'
     }
 };

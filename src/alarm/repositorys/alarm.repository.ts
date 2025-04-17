@@ -20,7 +20,7 @@ export class AlarmTypeOrmRepository implements IAlarmRepository{
         return this.alarmRepository.save(alarms);
     }
 
-    async read(alarmId: string) {
+    async read(alarmId: number) {
         const alarm = await this.alarmRepository.findOneBy({
             id: alarmId
         });

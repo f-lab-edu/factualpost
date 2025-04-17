@@ -11,5 +11,7 @@ export const ERROR_MESSAGES = {
     ARTICLE_USER_NOT_FOUND: 'The requested article and user were not found.',
     ONLY_POST_WRITER: 'Only post writers can send alarms.',
     ALARM_NOT_FOUND: 'Alarm not found',
-    NOT_EXIST_LIKED_USER: 'No users liked the article.'
+    NOT_EXIST_LIKED_USER: 'No users liked the article.',
+    NO_SUCH_KEY: 'Like count sync not matched',
+    USER_ALREADY_EXIST: 'User already exists'
 };

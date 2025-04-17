@@ -18,35 +18,10 @@ export class UserTypeOrmRepository implements IUserRepository {
     ){}
 
     async createUser(user: SignInUser): Promise<void> {
-        const queryRunner = this.dataSource.createQueryRunner();
-    
-        try {
-            await queryRunner.connect();
-            await queryRunner.startTransaction();
-    
-            const { userId } = user;
-            const existUser = await this.isExist(userId);
-    
-            if (existUser) {
-                throw new ConflictException(HttpStatus.CONFLICT);
-            }
-    
-            await queryRunner.manager
-                            .createQueryBuilder()
-                            .insert()
-                            .into(Users)
-                            .values(user)
-                            .execute();
-    
-            await queryRunner.commitTransaction();
-        } catch (err) {
-            await queryRunner.rollbackTransaction();
-        } finally {
-            await queryRunner.release();
-        }
+        await this.userRepository.insert(user);
     }
 
-    private async isExist(userId: string): Promise<boolean> {
+    async isExist(userId: string): Promise<boolean> {
         return this.userRepository.exists({ 
             where: { 
                 userId, 

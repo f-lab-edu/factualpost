@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable } from "@nestjs/common";
 import { UserDTO } from 'src/types';
 import { IUSER_REPOSITORY, IUserRepository } from "./repositorys/interface/user.repository.interface";
 import { UserProfile, LoginUser } from "./dtos/user.dto";
@@ -24,6 +24,13 @@ export class UserValidation {
         const isValid = await this.comparePassword(password, hashedPassword);
         if (!isValid) {
             throw new BadRequestException(ERROR_MESSAGES.INCORRECT_CREDENTIALS);
+        }
+    }
+    
+    async isExistUser(userId: string) {
+        const existUser = await this.userRepository.isExist(userId);
+        if (existUser) {
+            throw new ConflictException(ERROR_MESSAGES.USER_ALREADY_EXIST);
         }
     }
 

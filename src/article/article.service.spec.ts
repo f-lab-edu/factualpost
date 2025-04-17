@@ -4,8 +4,8 @@ import { ArticleService } from "./article.service";
 import { IArticleRepository } from "./repositorys/interface/article.interface";
 import { IUserRepository } from "src/user/repositorys/interface/user.repository.interface";
 import { ERROR_MESSAGES } from "src/common/constants/error-message";
-import { Article } from "src/entities/Article";
 import { Users } from "src/entities/Users";
+import { ArticleMeta } from "src/entities/article-meta";
 
 describe("ArticleService", () => {
     let articleService: ArticleService;
@@ -22,9 +22,9 @@ describe("ArticleService", () => {
                         getArticles: jest.fn(),
                         getArticle: jest.fn(),
                         write: jest.fn(),
-                        findById: jest.fn(),
-                        update: jest.fn(),
+                        findOne: jest.fn(),
                         remove: jest.fn(),
+                        update: jest.fn(),
                     },
                 },
                 {
@@ -50,13 +50,12 @@ describe("ArticleService", () => {
     describe("getArticles", () => {
         it("should call getArticles from articleRepository", async () => {
             const searchData = { keyword: "test" };
-            const cursor = 1;
-            const mockArticles = [new Article()];
+            const mockArticles = [new ArticleMeta()];
             jest.spyOn(articleRepository, "getArticles").mockResolvedValue(mockArticles);
 
-            const result = await articleService.getArticles(searchData, cursor);
+            const result = await articleService.getArticles(searchData);
 
-            expect(articleRepository.getArticles).toHaveBeenCalledWith(searchData, cursor);
+            expect(articleRepository.getArticles).toHaveBeenCalledWith(searchData);
             expect(result).toEqual(mockArticles);
         });
     });
@@ -64,7 +63,7 @@ describe("ArticleService", () => {
     describe("getArticle", () => {
         it("should return an article by ID", async () => {
             const articleId = 1;
-            const mockArticle = new Article();
+            const mockArticle = { id: articleId, title: "Test Article" };
             jest.spyOn(articleRepository, "getArticle").mockResolvedValue(mockArticle);
 
             const result = await articleService.getArticle(articleId);
@@ -93,25 +92,21 @@ describe("ArticleService", () => {
         it("should update an article if the user is authorized", async () => {
             const articleData = { title: "Updated Title", contents: "Updated Content", userId: 1 };
             const articleId = 1;
-            const mockArticle = new Article();
-            mockArticle.user = new Users();
-            mockArticle.user.id = 1;
-            jest.spyOn(articleRepository, "findById").mockResolvedValue(mockArticle);
+            const mockArticle = { userId: 1 };
+            jest.spyOn(articleRepository, "findOne").mockResolvedValue(mockArticle);
             jest.spyOn(articleRepository, "update").mockResolvedValue();
 
             await articleService.update(articleData, articleId);
 
-            expect(articleRepository.findById).toHaveBeenCalledWith(articleId);
+            expect(articleRepository.findOne).toHaveBeenCalledWith(articleId);
             expect(articleRepository.update).toHaveBeenCalledWith(articleData, articleId);
         });
 
         it("should throw an error if the user is unauthorized", async () => {
             const articleData = { title: "Updated Title", contents: "Updated Content", userId: 2 };
             const articleId = 1;
-            const mockArticle = new Article();
-            mockArticle.user = new Users();
-            mockArticle.user.id = 1;
-            jest.spyOn(articleRepository, "findById").mockResolvedValue(mockArticle);
+            const mockArticle = { userId: 1 };
+            jest.spyOn(articleRepository, "findOne").mockResolvedValue(mockArticle);
 
             await expect(articleService.update(articleData, articleId)).rejects.toThrow(
                 new ForbiddenException(ERROR_MESSAGES.UNAUTHORIZED_UPDATE),
@@ -123,25 +118,21 @@ describe("ArticleService", () => {
         it("should remove an article if the user is authorized", async () => {
             const userId = 1;
             const articleId = 1;
-            const mockArticle = new Article();
-            mockArticle.user = new Users();
-            mockArticle.user.id = userId;
-            jest.spyOn(articleRepository, "findById").mockResolvedValue(mockArticle);
+            const mockArticle = { userId };
+            jest.spyOn(articleRepository, "findOne").mockResolvedValue(mockArticle);
             jest.spyOn(articleRepository, "remove").mockResolvedValue();
 
             await articleService.remove(userId, articleId);
 
-            expect(articleRepository.findById).toHaveBeenCalledWith(articleId);
+            expect(articleRepository.findOne).toHaveBeenCalledWith(articleId);
             expect(articleRepository.remove).toHaveBeenCalledWith(mockArticle);
         });
 
         it("should throw an error if the user is unauthorized", async () => {
             const userId = 2;
             const articleId = 1;
-            const mockArticle = new Article();
-            mockArticle.user = new Users();
-            mockArticle.user.id = 1;
-            jest.spyOn(articleRepository, "findById").mockResolvedValue(mockArticle);
+            const mockArticle = { userId: 1 };
+            jest.spyOn(articleRepository, "findOne").mockResolvedValue(mockArticle);
 
             await expect(articleService.remove(userId, articleId)).rejects.toThrow(
                 new ForbiddenException(ERROR_MESSAGES.UNAUTHORIZED_DELETE),

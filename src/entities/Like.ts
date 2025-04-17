@@ -1,23 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, Index, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from './base.entity';
 import { Users } from './Users';
-import { Article } from './Article';
+import { ArticleMeta } from './article-meta';
 
-@Entity("likes")
-export class Like {
-    @PrimaryGeneratedColumn()
-    id: number;
+@Entity('likes')
+@Index('uq_like', ['articleId', 'userId'], { unique: true })
+@Index('idx_article_created', ['articleId', 'createdAt'])
+export class Like extends BaseEntity {
+    @Column({ type: 'int', nullable: false })
+    userId: number;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
+    @Column({ type: 'bigint', nullable: false })
+    articleId: number;
 
-    @DeleteDateColumn({ type: 'timestamp', nullable: true })
-    deletedAt: Date | null;
-
-    @ManyToOne(() => Users, (user) => user.likes, { eager: true })
+    @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: Users;
 
-    @ManyToOne(() => Article, (article) => article.likes, { eager: true })
+    @ManyToOne(() => ArticleMeta, (article) => article.id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'articleId' })
-    article: Article;
+    article: ArticleMeta;
 }
