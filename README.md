@@ -69,3 +69,8 @@
 ## 추후 개선 구조
 
 ![추후_아키텍처_구조](https://github.com/user-attachments/assets/5e442235-5edc-4474-b156-1ad6935cb4f8)
+
+
+## 꽤나 깊은 생각들
+
+https://github.com/f-lab-edu/factualpost/pull/12
