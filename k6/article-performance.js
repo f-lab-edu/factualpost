@@ -3,8 +3,8 @@ import { check, sleep } from 'k6';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 
 export const options = {
-    vus: 30,
-    duration: '300s',
+    vus: 800,
+    duration: '30s',
     thresholds: {
         http_req_duration: ['p(95)<500'],
     },
@@ -20,7 +20,10 @@ let userLikes = {}; // 사용자별 좋아요 상태 저장
 
 function like(articleId, userId) {
     const url = `${BASE_URL}/${articleId}/like`;
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 
+                        'Content-Type': 'application/json',
+                        'X-User-Id': userId.toString()
+                    };
     const res = http.put(url, null, { headers });
 
     check(res, {
@@ -40,7 +43,10 @@ function like(articleId, userId) {
 function unlike(articleId, userId) {
     if (userLikes[userId] && userLikes[userId].has(articleId)) {
         const url = `${BASE_URL}/${articleId}/like`;
-        const headers = { 'Content-Type': 'application/json' };
+        const headers = { 
+                            'Content-Type': 'application/json',
+                            'X-User-Id': userId.toString()
+                        };
         const res = http.del(url, null, { headers });
 
         check(res, {

@@ -102,4 +102,10 @@ export class RedisService implements ICacheMemory{
         await this.redisClient.exists(oldKey);
         await this.redisClient.multi().rename(oldKey, newKey).exec();
     }
+
+    async sScan(key: string, cursor: number, batchSize: number): Promise<[number, string[]]> {
+        const { cursor: nextCursor, members } = await this.redisClient.sScan(key, cursor, { COUNT: batchSize });
+        return [cursor, members];
+    }
+
 }
