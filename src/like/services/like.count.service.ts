@@ -39,7 +39,8 @@ export class LikeCountService {
 
                 cursor = nextCursor;
             } while (cursor !== 0);
-
+            
+            await this.removeTempKey();
         } catch(err) {
             console.error(`[Like Count Service] Update failed: ${err.message}`);
         } finally {
