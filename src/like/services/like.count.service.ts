@@ -18,20 +18,30 @@ export class LikeCountService {
 
     @Cron(LIKE_CRON_TIME)
     async synchronizeLikeCount() {
-
         let lock: Lock | null = null;
 
         try {
             lock = await this.cacheLockService.acquire(LOCK_KEY, LOCK_TTL);
             await this.renameTransaction();
-            const likeCountKeys = await this.getLikeCountKeys();
-            const batches = this.chunkArrayIntoBatches(likeCountKeys, BATCH_SIZE);
-            for (const batchKeys of batches) {
-                const updateData = await this.processLikeCountBatch(batchKeys);
-                await this.articleRepository.bulkUpdateLikeCount(updateData);
-            }
+
+            let cursor = 0;
+            do {
+                const [nextCursor, batchKeys] = await this.cacheService.sScan(
+                    LIKE_COUNT_SYNC_TEMP,
+                    cursor,
+                    BATCH_SIZE
+                );
+
+                if(batchKeys.length > 0) {
+                    const updateData = await this.processLikeCountBatch(batchKeys);
+                    await this.articleRepository.bulkUpdateLikeCount(updateData);
+                }
+
+                cursor = nextCursor;
+            } while (cursor !== 0);
+            
             await this.removeTempKey();
-        } catch (err) {
+        } catch(err) {
             console.error(`[Like Count Service] Update failed: ${err.message}`);
         } finally {
             if(lock) {

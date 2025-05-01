@@ -13,6 +13,7 @@ export interface ICacheMemory {
     renameKey(oldKey: string, newKey: string): Promise<void>
     getKeysAndLikeCount(keys: string[]): Promise<{ [key: string]: string | null }>
     renameTransaction(oldKey: string, newKey: string): Promise<void>
+    sScan(key: string, cursor: number, batchSize: number): Promise<[number, string[]]>
 }
 
 export interface ILockService {
